@@ -1,6 +1,6 @@
 
 import { MdLocationCity, MdOutlineHome, MdWorkOutline } from "react-icons/md";
-
+import { HiOutlineUserGroup } from "react-icons/hi";
 
 import {
   Sidebar,
@@ -24,7 +24,7 @@ const items = [
   },
   {
     title: "Sites",
-    url: "sites",
+    url: "/sites",
     icon: MdLocationCity,
   },
   {
@@ -32,17 +32,13 @@ const items = [
     url: "/postes",
     icon: MdWorkOutline,
   },
+  {
+    title: "Employés",
+    url: "/employes",
+    icon: HiOutlineUserGroup,
+  },
 
-  // {
-  //   title: "Search",
-  //   url: "#",
-  //   icon: Search,
-  // },
-  // {
-  //   title: "Settings",
-  //   url: "#",
-  //   icon: Settings,
-  // },
+
 ]
 
 export function AppSidebar() {
