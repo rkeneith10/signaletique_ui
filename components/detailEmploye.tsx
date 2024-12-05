@@ -47,19 +47,47 @@ interface Employe {
 
 interface DetailEmploye {
   isOpen: boolean;
-  onClose:()=>void;
+  onClose: () => void;
   employe?: Employe;
 }
 
-const DetailEmploye: React.FC<DetailEmploye> = ({ isOpen,onClose,employe }) => {
+interface AdresseEmp {
+  id_adresses: number;
+  numero_rue: string;
+  libelle_adresse: string;
+  statut: string;
+  id_sectioncommunale?: number;
+  villeRecord?: string;
+  code_postal?: string;
+  cle_unicite: string;
+  from: string;
+}
+
+const DetailEmploye: React.FC<DetailEmploye> = ({ isOpen, onClose, employe }) => {
   const [siteinfo, setSiteInfo] = useState<Site[]>([]);
   const [postInfo, setPostInfo] = useState<Post[]>([]);
+  const [adresseInfo, setAdresseInfo] = useState<AdresseEmp | null>(null);
 
-  useEffect(()=>{
+  useEffect(() => {
     fetchPost();
     fetchSite();
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  },[])
+    if (employe?.id_adress) {
+      fetchAdresse();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
+
+
+  const fetchAdresse = async () => {
+    try {
+      const response = await axios.get(`http://localhost:3001/api/adresseCtrl/${employe?.id_adress}`);
+      console.log(response)
+      setAdresseInfo(response.data);
+    } catch (error) {
+      console.error("Erreur lors de la récupération de l'adresse :", error);
+    }
+  };
+
 
   const fetchSite = async () => {
     try {
@@ -101,76 +129,81 @@ const DetailEmploye: React.FC<DetailEmploye> = ({ isOpen,onClose,employe }) => {
           <AlertDialogHeader>
             <AlertDialogTitle>Information de {`${employe?.first_name} ${employe?.last_name}`}</AlertDialogTitle>
             <AlertDialogDescription>
-           {employe ? (
-                 <div className="grid grid-cols-2 gap-4">
-                 <div className="text-gray-900">
-                   <strong>Prénom:</strong> {employe.first_name || 'N/A'}
-                 </div>
-                 <div className="text-gray-900">
-                   <strong>Nom:</strong> {employe.last_name || 'N/A'}
-                 </div>
-                 <div className="text-gray-900">
-                   <strong>Statut matrimonial:</strong> {employe.marital_status || 'N/A'}
-                 </div>
-                 <div className="text-gray-900">
-                   <strong>Numéro de compte bancaire:</strong> {employe.bank_account_number || 'N/A'}
-                 </div>
-                 <div className="text-gray-900">
-                   <strong>Nom du compte bancaire:</strong> {employe.bank_account_name || 'N/A'}
-                 </div>
-                 <div className="text-gray-900">
-                   <strong>Nom du contact:</strong> {employe.contact_name || 'N/A'}
-                 </div>
-                 <div className="text-gray-900">
-                   <strong>Numéro du contact:</strong> {employe.contact_phone_number || 'N/A'}
-                 </div>
-                 <div className="text-gray-900">
-                   <strong>Date de naissance:</strong> {employe.date_of_birth || 'N/A'}
-                 </div>
-                 <div className="text-gray-900">
-                   <strong>Téléphone personnel:</strong> {employe.personal_phone_number || 'N/A'}
-                 </div>
-                 <div className="text-gray-900">
-                   <strong>Email personnel:</strong> {employe.personal_email || 'N/A'}
-                 </div>
-                 <div className="text-gray-900">
-                   <strong>NIF:</strong> {employe.nif || 'N/A'}
-                 </div>
-                 <div className="text-gray-900">
-                   <strong>NINU:</strong> {employe.ninu || 'N/A'}
-                 </div>
-                 <div className="text-gray-900">
-                   <strong>Téléphone professionnel:</strong> {employe.work_phone_number || 'N/A'}
-                 </div>
-                 <div className="text-gray-900">
-                   <strong>Email professionnel:</strong> {employe.work_email || 'N/A'}
-                 </div>
-                 <div className="text-gray-900">
-                   <strong>Date dembauche:</strong> {employe.start_up_date || 'N/A'}
-                 </div>
-                 <div className="text-gray-900"> 
-                   <strong>Catégorie:</strong> {employe.category || 'N/A'}
-                 </div>
-                 <div className="text-gray-900">
-                   <strong>Échelle salariale:</strong> {employe.salary_scale || 'N/A'}
-                 </div>
-                 <div className="text-gray-900">
-                   <strong>Numéro de badge:</strong> {employe.badge_number || 'N/A'}
-                 </div>
-                 <div className="text-gray-900">
-                   <strong>Qualification:</strong> {employe.title_qualification || 'N/A'}
-                 </div>
-                 <div className="text-gray-900">
-                   <strong>Remarques:</strong> {employe.remarques || 'N/A'}
-                 </div>
-                 <div className="text-gray-900">
-                   <strong>Site:</strong> { getSiteNameById(employe.site) || 'N/A'}
-                 </div>
-                 <div className="text-gray-900">
-                   <strong>Posts:</strong> {employe.posts.map((id) => getPostByID(id)).join(", ") || 'N/A'}
-                 </div>
-               </div>
-           ) : ""}
+              {employe ? (
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="text-gray-900">
+                    <strong>Prénom:</strong> {employe.first_name || 'N/A'}
+                  </div>
+                  <div className="text-gray-900">
+                    <strong>Nom:</strong> {employe.last_name || 'N/A'}
+                  </div>
+                  <div className="text-gray-900">
+                    <strong>Statut matrimonial:</strong> {employe.marital_status || 'N/A'}
+                  </div>
+                  <div className="text-gray-900">
+                    <strong>Adresse:</strong>  {adresseInfo ? `${adresseInfo.numero_rue} ${adresseInfo.libelle_adresse}, ${adresseInfo.villeRecord}` : 'N/A'}
+                    
+                  </div>
+
+                  <div className="text-gray-900">
+                    <strong>Numéro de compte bancaire:</strong> {employe.bank_account_number || 'N/A'}
+                  </div>
+                  <div className="text-gray-900">
+                    <strong>Nom du compte bancaire:</strong> {employe.bank_account_name || 'N/A'}
+                  </div>
+                  <div className="text-gray-900">
+                    <strong>Nom du contact:</strong> {employe.contact_name || 'N/A'}
+                  </div>
+                  <div className="text-gray-900">
+                    <strong>Numéro du contact:</strong> {employe.contact_phone_number || 'N/A'}
+                  </div>
+                  <div className="text-gray-900">
+                    <strong>Date de naissance:</strong> {employe.date_of_birth || 'N/A'}
+                  </div>
+                  <div className="text-gray-900">
+                    <strong>Téléphone personnel:</strong> {employe.personal_phone_number || 'N/A'}
+                  </div>
+                  <div className="text-gray-900">
+                    <strong>Email personnel:</strong> {employe.personal_email || 'N/A'}
+                  </div>
+                  <div className="text-gray-900">
+                    <strong>NIF:</strong> {employe.nif || 'N/A'}
+                  </div>
+                  <div className="text-gray-900">
+                    <strong>NINU:</strong> {employe.ninu || 'N/A'}
+                  </div>
+                  <div className="text-gray-900">
+                    <strong>Téléphone professionnel:</strong> {employe.work_phone_number || 'N/A'}
+                  </div>
+                  <div className="text-gray-900">
+                    <strong>Email professionnel:</strong> {employe.work_email || 'N/A'}
+                  </div>
+                  <div className="text-gray-900">
+                    <strong>Date dembauche:</strong> {employe.start_up_date || 'N/A'}
+                  </div>
+                  <div className="text-gray-900">
+                    <strong>Catégorie:</strong> {employe.category || 'N/A'}
+                  </div>
+                  <div className="text-gray-900">
+                    <strong>Échelle salariale:</strong> {employe.salary_scale || 'N/A'}
+                  </div>
+                  <div className="text-gray-900">
+                    <strong>Numéro de badge:</strong> {employe.badge_number || 'N/A'}
+                  </div>
+                  <div className="text-gray-900">
+                    <strong>Qualification:</strong> {employe.title_qualification || 'N/A'}
+                  </div>
+                  <div className="text-gray-900">
+                    <strong>Remarques:</strong> {employe.remarques || 'N/A'}
+                  </div>
+                  <div className="text-gray-900">
+                    <strong>Site:</strong> {getSiteNameById(employe.site) || 'N/A'}
+                  </div>
+                  <div className="text-gray-900">
+                    <strong>Posts:</strong> {employe.posts.map((id) => getPostByID(id)).join(", ") || 'N/A'}
+                  </div>
+                </div>
+              ) : ""}
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>

@@ -1,11 +1,11 @@
 "use client";
 import DetailEmploye from '@/components/detailEmploye';
-import FormModalPoste from '@/components/formModalPoste';
 import Layout from '@/components/rootLayout';
 import SearchInput from '@/components/searchInput';
 import { Button } from '@/components/ui/button';
 import { Checkbox } from "@/components/ui/checkbox";
 
+import FormModalEmploye from '@/components/formModalEmploye';
 import SkeletonTable from '@/components/skeletonTable';
 import {
   AlertDialog,
@@ -73,16 +73,16 @@ const Employes = () => {
   const [empData, setEmpData] = useState<Employe[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [checkedItem, setCheckedItem] = useState<string | null>();
-  const [selectedEmp,setSelectedEmp] = useState<Employe | undefined>()
+  const [selectedEmp, setSelectedEmp] = useState<Employe | undefined>()
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 8;
   const totalPages = Math.ceil(empData.length / itemsPerPage)
   const startIndex = (currentPage - 1) * itemsPerPage;
-  const [showModal, setShowModal] = useState<boolean>(false);
+  const [showModalMessage, setShowModalMessage] = useState<boolean>(false);
   const [showModalDelete, setShowModalDelete] = useState<boolean>(false);
   const [siteinfo, setSiteInfo] = useState<Site[]>([]);
   const [postInfo, setPostInfo] = useState<Post[]>([])
-  const [modalMessage, setModalMessage] = useState("")
+  //const [modalMessage, setModalMessage] = useState("")
   const [showDetailEmp, setShowDetailEmp] = useState<boolean>(false);
 
   const filteredInfo = empData.filter((emp) =>
@@ -94,7 +94,7 @@ const Employes = () => {
     setCurrentPage(page)
   }
 
-  const handleShowDetail = (employe:Employe) => {
+  const handleShowDetail = (employe: Employe) => {
     setSelectedEmp(employe)
     setShowDetailEmp(true);
 
@@ -103,16 +103,16 @@ const Employes = () => {
   const handleChangeCheck = (id: string) => {
     setCheckedItem((prev) => (prev === id ? null : id));
   };
-  const handleSuccess = () => {
-    fetchEmploye();
-    setShowModal(true)
-    setModalMessage("Le poste a été enregistré avec succès");
+  // const handleSuccess = () => {
+  //   fetchEmploye();
+  //   setShowModal(true)
+  //   setModalMessage("Le poste a été enregistré avec succès");
 
-  };
-  const handleFailed = () => {
-    setModalMessage("Une erreur est survenue lors de l'ajout");
-    setShowModal(true)
-  };
+  // };
+  // const handleFailed = () => {
+  //   setModalMessage("Une erreur est survenue lors de l'ajout");
+  //   setShowModal(true)
+  // };
   useEffect(() => {
     document.title = "Employes"
     fetchEmploye();
@@ -137,8 +137,9 @@ const Employes = () => {
     try {
       if (checkedItem) {
 
-        const idToDelete = checkedItem[0];
+        const idToDelete = checkedItem;
         await axios.delete(`http://localhost:8000/api/employees/${idToDelete}/`);
+        setShowModalMessage(true);
         setEmpData(empData.filter((item) => item.id !== idToDelete));
       }
       setCheckedItem(null);
@@ -152,8 +153,6 @@ const Employes = () => {
     try {
       const response = await axios.get("http://localhost:8000/api/sites/");
       setSiteInfo(response.data);
-      console.log("Site")
-      console.log(siteinfo)
     } catch (error) {
       console.error("Erreur lors de la récupération  :", error);
     }
@@ -163,8 +162,6 @@ const Employes = () => {
     try {
       const response = await axios.get("http://localhost:8000/api/posts/");
       setPostInfo(response.data);
-      console.log("Poste")
-      console.log(postInfo)
     } catch (error) {
       console.error("Erreur lors de la récupération  :", error);
     }
@@ -197,7 +194,7 @@ const Employes = () => {
 
                     <div className='flex flex-row items-center space-x-4 mb-4'>
 
-                      <FormModalPoste onSuccess={handleSuccess} onFailed={handleFailed} />
+                      <FormModalEmploye />
                       <Link href={`/employes/${checkedItem}`} className='flex items-center '>
                         <Button
                           disabled={!checkedItem}
@@ -295,7 +292,7 @@ const Employes = () => {
                                 <TooltipProvider>
                                   <Tooltip>
                                     <TooltipTrigger asChild>
-                                      <Button variant="outline" size="icon" onClick={()=>handleShowDetail(item)}>
+                                      <Button variant="outline" size="icon" onClick={() => handleShowDetail(item)}>
                                         <ChevronRight />
                                       </Button>
                                     </TooltipTrigger>
@@ -358,23 +355,23 @@ const Employes = () => {
             </>
           )}
 
-        {showModal && (
-          <AlertDialog open={showModal}>
-            {/* <AlertDialogTrigger>Open</AlertDialogTrigger> */}
-            <AlertDialogContent>
-              <AlertDialogHeader>
-                <AlertDialogTitle>Comfirmation</AlertDialogTitle>
-                <AlertDialogDescription>
-                  {modalMessage}
-                </AlertDialogDescription>
-              </AlertDialogHeader>
-              <AlertDialogFooter>
 
-                <AlertDialogAction onClick={() => setShowModal(false)}>Fermer</AlertDialogAction>
-              </AlertDialogFooter>
-            </AlertDialogContent>
-          </AlertDialog>
-        )}
+        <AlertDialog open={showModalMessage}>
+
+          <AlertDialogContent>
+            <AlertDialogHeader>
+              <AlertDialogTitle>Comfirmation</AlertDialogTitle>
+              <AlertDialogDescription>
+                Suppression reussie
+              </AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter>
+
+              <AlertDialogAction onClick={() => setShowModalMessage(false)}>Fermer</AlertDialogAction>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
+
 
         {showModalDelete && (
           <AlertDialog open={showModalDelete}>
@@ -401,8 +398,8 @@ const Employes = () => {
         {showDetailEmp && (
           <DetailEmploye
             isOpen={showDetailEmp}
-            onClose={()=>setShowDetailEmp(false)}
-            employe={selectedEmp }
+            onClose={() => setShowDetailEmp(false)}
+            employe={selectedEmp}
 
           />
         )}
