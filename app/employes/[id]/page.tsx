@@ -208,34 +208,11 @@ const InfoEmploye = ({ params }: { params: { id: string } }) => {
         console.error("Error fetching posts:", error);
       }
     };
-    const fetchAdressEmp = async () => {
-      console.log(idAdr)
-      setLoading(true);
-      try {
-        const response = await axios.get(`http://localhost:3001/api/adresseCtrl/57`);
 
-        setFormData(prevFormData => ({
-          ...prevFormData,
-          personalInfo: {
-            ...prevFormData.personalInfo,
-            numero_rue: response.data.numero_rue || prevFormData.personalInfo.numero_rue,
-            libelle_adresse: response.data.libelle_adresse || prevFormData.personalInfo.libelle_adresse,
-            villeRecord: response.data.villeRecord || prevFormData.personalInfo.villeRecord,
-          }
-        }));
-      } catch (error) {
-        setLoading(false);
-        if (axios.isAxiosError(error)) {
-          console.error("Axios error:", error.message);
-        } else {
-          console.error("Unexpected error:", error);
-        }
-      }
-    };
     fetchEmployeeInfo();
     fetchSite();
     fetchPost();
-    fetchAdressEmp();
+    
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [id]);
 
@@ -318,8 +295,8 @@ const InfoEmploye = ({ params }: { params: { id: string } }) => {
         ) : (info ? (
           <div className="h-auto bg-white rounded-md shadow-md p-10 justify-center items-center mt-10">
             <form onSubmit={handleUpdateInfo}>
-              <Tabs defaultValue="personalInfo" className="w-full">
-                <TabsList>
+              <Tabs defaultValue="personalInfo" className="w-full relative rounded-sm overflow-x-scroll">
+                <TabsList className='absolute flex flex-row justify-stretch '>
                   <TabsTrigger value="personalInfo">Information Personnel</TabsTrigger>
                   <TabsTrigger value="professionalInfo">Information Professionnel</TabsTrigger>
                   <TabsTrigger value="financialInfo">Information Financiere</TabsTrigger>
@@ -327,8 +304,8 @@ const InfoEmploye = ({ params }: { params: { id: string } }) => {
                 </TabsList>
 
                 {/* Section - Information Personnel */}
-                <TabsContent value="personalInfo">
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <TabsContent value="personalInfo" className='mt-10 mb-10'>
+                  <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
                     <div>
                       <Label htmlFor="first_name">Prénom</Label>
                       <Input
@@ -460,8 +437,8 @@ const InfoEmploye = ({ params }: { params: { id: string } }) => {
                 </TabsContent>
 
                 {/* Section - Information Professionnel */}
-                <TabsContent value="professionalInfo">
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <TabsContent value="professionalInfo" className='mt-10 mb-10' >
+                  <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
                     <div>
                       <Label htmlFor="badge_number">Numéro de Badge</Label>
                       <Input
@@ -595,8 +572,8 @@ const InfoEmploye = ({ params }: { params: { id: string } }) => {
                 </TabsContent>
 
                 {/* Section - Information Financière */}
-                <TabsContent value="financialInfo">
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <TabsContent value="financialInfo" className='mt-10 mb-10'>
+                  <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
                     <div>
                       <Label htmlFor="bank_account_number">Numéro de Compte Bancaire</Label>
                       <Input
@@ -627,8 +604,8 @@ const InfoEmploye = ({ params }: { params: { id: string } }) => {
                 </TabsContent>
 
                 {/* Section - Information Additionnelle */}
-                <TabsContent value="additionalInfo">
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <TabsContent value="additionalInfo" className='mt-10 mb-10'>
+                  <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
                     <div>
                       <Label htmlFor="contact_name">Nom du Contact</Label>
                       <Input

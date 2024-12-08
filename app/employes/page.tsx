@@ -18,7 +18,17 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import { Pagination, PaginationContent, PaginationEllipsis, PaginationItem, PaginationLink, PaginationNext, PaginationPrevious } from "@/components/ui/pagination";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+
+import {
+  Table,
+  TableBody,
+
+  TableCell,
+
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
 import {
   Tooltip,
   TooltipContent,
@@ -220,43 +230,29 @@ const Employes = () => {
                   </div>
 
                   <div className='mt-6'>
-                    <div className='overflow-x-auto'>
-                      <Table>
+                    <div className=" ">
+                      <Table className="min-w-[1200px]">
                         <TableHeader>
                           <TableRow>
                             <TableHead></TableHead>
-                            <TableHead className='uppercase font-bold text-gray-900'>#</TableHead>
-                            <TableHead className='uppercase font-bold text-gray-900'>Prenom</TableHead>
-                            <TableHead className='uppercase font-bold text-gray-900'>Nom</TableHead>
-                            {/* <TableHead className='uppercase font-bold text-gray-900'>Statut matrimoniale</TableHead> */}
-                            {/* <TableHead className='uppercase font-bold text-gray-900'>Numero bancaire</TableHead>
-                            <TableHead className='uppercase font-bold text-gray-900'>Nom banque</TableHead> */}
-
-
-                            {/* <TableHead className='uppercase font-bold text-gray-900'>Date de naissance</TableHead> */}
-                            <TableHead className='uppercase font-bold text-gray-900'>Telephone personnel</TableHead>
-                            <TableHead className='uppercase font-bold text-gray-900'>Email Personnel</TableHead>
-                            {/* <TableHead className='uppercase font-bold text-gray-900'>NIF</TableHead>
-                            <TableHead className='uppercase font-bold text-gray-900'>NINU</TableHead> */}
-                            <TableHead className='uppercase font-bold text-gray-900'>Telephone travail</TableHead>
-                            <TableHead className='uppercase font-bold text-gray-900'>email travail</TableHead>
-                            {/* <TableHead className='uppercase font-bold text-gray-900'>Date commencement</TableHead>
-                            <TableHead className='uppercase font-bold text-gray-900'>Grille salariale</TableHead> */}
-                            <TableHead className='uppercase font-bold text-gray-900'>NUmero Badge</TableHead>
-                            <TableHead className='uppercase font-bold text-gray-900'>Personne de contact</TableHead>
-                            <TableHead className='uppercase font-bold text-gray-900'>Numero de contact</TableHead>
-                            <TableHead className='uppercase font-bold text-gray-900'>Site</TableHead>
-                            <TableHead className='uppercase font-bold text-gray-900'>Postes</TableHead>
-                            <TableHead className='font-bold text-gray-900'>
-
-                            </TableHead>
+                            <TableHead className="uppercase font-bold text-gray-900">#</TableHead>
+                            <TableHead className="uppercase font-bold text-gray-900">Prenom</TableHead>
+                            <TableHead className="uppercase font-bold text-gray-900">Nom</TableHead>
+                            <TableHead className="uppercase font-bold text-gray-900">Telephone personnel</TableHead>
+                            <TableHead className="uppercase font-bold text-gray-900">Email Personnel</TableHead>
+                            <TableHead className="uppercase font-bold text-gray-900">Telephone travail</TableHead>
+                            <TableHead className="uppercase font-bold text-gray-900">Email travail</TableHead>
+                            <TableHead className="uppercase font-bold text-gray-900">Numero Badge</TableHead>
+                            <TableHead className="uppercase font-bold text-gray-900">Personne de contact</TableHead>
+                            <TableHead className="uppercase font-bold text-gray-900">Numero de contact</TableHead>
+                            <TableHead className="uppercase font-bold text-gray-900">Site</TableHead>
+                            <TableHead className="uppercase font-bold text-gray-900">Postes</TableHead>
+                            <TableHead className="font-bold text-gray-900"></TableHead>
                           </TableRow>
                         </TableHeader>
                         <TableBody>
                           {filteredInfo.slice(startIndex, startIndex + itemsPerPage).map((item, index) => (
-                            <TableRow key={item.id}
-
-                            >
+                            <TableRow key={item.id}>
                               <TableCell>
                                 <Checkbox
                                   className={`cursor-pointer ${checkedItem === item.id ? "bg-blue-100" : ""
@@ -268,31 +264,26 @@ const Employes = () => {
                               <TableCell>{index + 1}</TableCell>
                               <TableCell>{item.first_name}</TableCell>
                               <TableCell>{item.last_name}</TableCell>
-                              {/* <TableCell>{item.marital_status}</TableCell> */}
-                              {/* <TableCell>{item.bank_account_number}</TableCell>
-                              <TableCell>{item.bank_account_name}</TableCell> */}
-
-                              {/* <TableCell>{item.date_of_birth}</TableCell> */}
                               <TableCell>{item.personal_phone_number}</TableCell>
                               <TableCell>{item.personal_email}</TableCell>
-                              {/* <TableCell>{item.nif}</TableCell>
-                              <TableCell>{item.ninu}</TableCell> */}
                               <TableCell>{item.work_phone_number}</TableCell>
                               <TableCell>{item.work_email}</TableCell>
-                              {/* <TableCell>{item.start_up_date}</TableCell>
-                              <TableCell>{item.salary_scale}</TableCell> */}
                               <TableCell>{item.badge_number}</TableCell>
                               <TableCell>{item.contact_name}</TableCell>
                               <TableCell>{item.contact_phone_number}</TableCell>
                               <TableCell>{getSiteNameById(item.site)}</TableCell>
-                              <TableCell> {item.posts.map((id) => getPostByID(id)).join(", ")}</TableCell>
-
-
+                              <TableCell>
+                                {item.posts.map((id) => getPostByID(id)).join(", ")}
+                              </TableCell>
                               <TableCell>
                                 <TooltipProvider>
                                   <Tooltip>
                                     <TooltipTrigger asChild>
-                                      <Button variant="outline" size="icon" onClick={() => handleShowDetail(item)}>
+                                      <Button
+                                        variant="outline"
+                                        size="icon"
+                                        onClick={() => handleShowDetail(item)}
+                                      >
                                         <ChevronRight />
                                       </Button>
                                     </TooltipTrigger>
@@ -302,8 +293,6 @@ const Employes = () => {
                                   </Tooltip>
                                 </TooltipProvider>
                               </TableCell>
-
-
                             </TableRow>
                           ))}
                         </TableBody>
@@ -318,7 +307,6 @@ const Employes = () => {
                                 }`}
                             />
                           </PaginationItem>
-
                           {[...Array(totalPages)].map((_, index) => (
                             <PaginationItem key={index}>
                               <PaginationLink
@@ -331,9 +319,7 @@ const Employes = () => {
                               </PaginationLink>
                             </PaginationItem>
                           ))}
-
                           {totalPages > 8 && <PaginationEllipsis />}
-
                           <PaginationItem>
                             <PaginationNext
                               href="#"
@@ -342,10 +328,10 @@ const Employes = () => {
                                 }`}
                             />
                           </PaginationItem>
-
                         </PaginationContent>
                       </Pagination>
                     </div>
+
                   </div>
                 </div>
 
