@@ -1,4 +1,5 @@
 "use client";
+import confirmUpdate from '@/components/confirmUpdate';
 import Layout from '@/components/rootLayout';
 import { AlertDialog, AlertDialogAction, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, } from '@/components/ui/alert-dialog';
 import { Button } from '@/components/ui/button';
@@ -126,9 +127,10 @@ const DetailSite = ({ params }: { params: { id: string } }) => {
 
       // Mise à jour des données avec la réponse de l'API
       setFormData(response.data);
-      setIsSuccess(true);
-      setModalMessage("Les informations ont été modifiées avec succès");
-      setShowModal(true);
+     confirmUpdate()
+     setTimeout(() => {
+      redirect();
+    }, 3000);
 
     } catch (error: unknown) {
       // Gérer l'erreur de mise à jour

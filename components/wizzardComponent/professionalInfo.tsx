@@ -82,7 +82,7 @@ const ProfessionalInfo = ({ data, onChange, }: { data: any; onChange: (data: any
   return (
     <div>
       <h2 className="text-xl font-semibold mb-4">Informations Professionnelles</h2>
-      <div className="space-y-4">
+      <div className="gap-4 grid grid-cols-2">
 
         <div>
           <Label htmlFor="badge_number">Numéro de badge</Label>

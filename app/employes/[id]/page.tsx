@@ -1,6 +1,8 @@
 "use client";
-import { MultiSelect } from '@/components/multiSelect';
+import confirmUpdate from '@/components/confirmUpdate';
+import MultipleSelector from '@/components/multiple-selector';
 import Layout from '@/components/rootLayout';
+import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import {
@@ -13,9 +15,12 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Textarea } from '@/components/ui/textarea';
 import axios from 'axios';
+import { Loader2 } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import React, { useEffect, useState } from 'react';
+import { toast } from 'sonner';
 
 
 interface FormDataType {
@@ -64,7 +69,10 @@ interface Post {
   id: string;
   post_name: string;
 }
-
+interface Option {
+  label: string;
+  value: string
+}
 const InfoEmploye = ({ params }: { params: { id: string } }) => {
   const { id } = params;
   const router = useRouter();
@@ -72,19 +80,19 @@ const InfoEmploye = ({ params }: { params: { id: string } }) => {
   //const [visibleTooltip, setVisibleTooltip] = useState<string | null>(null);
   //const [tooltips, setTooltips] = useState<Record<string, string>>({});
   const [updating, setUpdating] = useState<boolean>(false);
-  const [isSuccess, setIsSuccess] = useState<boolean>(false);
-  const [showModal, setShowModal] = useState<boolean>(false);
-  const [modalMessage, setModalMessage] = useState("");
-  const [idAdr, setIdAdr] = useState<number>(0)
+  const [selectedOptions, setSelectedOptions] = useState<Option[]>([]);
+
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [site, setSite] = useState<Site[]>([]);
-  const [posts, setPosts] = useState<Post[]>([])
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const [posts, setPosts] = useState<any[]>([])
 
   const [info, setInfo] = useState<FormDataType>();
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [selectedSite, setSelectedSite] = useState<string>("");
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [selectedPosts, setSelectedPosts] = useState<string[]>([]);
+  // const [postValue, setPostValue] = useState<string[]>([])
   const [formData, setFormData] = useState<FormDataType>({
     id: "",
     id_adress: "",
@@ -122,6 +130,11 @@ const InfoEmploye = ({ params }: { params: { id: string } }) => {
     },
   });
 
+
+  const redirect = () => {
+    router.push('/employes')
+  }
+
   useEffect(() => {
 
     const fetchEmployeeInfo = async () => {
@@ -129,10 +142,9 @@ const InfoEmploye = ({ params }: { params: { id: string } }) => {
       try {
         const response = await axios.get(`http://localhost:8000/api/employees/${id}/`);
         setInfo(response.data);
-        setIdAdr(response.data.id_adress)
-        console.log(response.data.id_adress, idAdr)
+
         const response2 = await axios.get(`http://localhost:3001/api/adresseCtrl/${response.data.id_adress}`);
-        console.log(response2)
+
 
         setFormData({
           id: response.data.id || "",
@@ -171,6 +183,7 @@ const InfoEmploye = ({ params }: { params: { id: string } }) => {
           },
         });
         setLoading(false);
+
       } catch (error) {
         setLoading(false);
         if (axios.isAxiosError(error)) {
@@ -204,6 +217,19 @@ const InfoEmploye = ({ params }: { params: { id: string } }) => {
         }));
 
         setPosts(options);
+        const responseEmp = await axios.get(`http://localhost:8000/api/employees/${id}/`);
+        console.log(responseEmp.data.posts)
+        const selectPost: Option[] = [];
+        responseEmp.data?.posts?.forEach((p: string) => {
+          console.log(p)
+          options.forEach((o: Option) => {
+            if (o.value === p) {
+              selectPost.push(o)
+            }
+          })
+        })
+        setSelectedOptions(selectPost)
+
       } catch (error) {
         console.error("Error fetching posts:", error);
       }
@@ -212,10 +238,9 @@ const InfoEmploye = ({ params }: { params: { id: string } }) => {
     fetchEmployeeInfo();
     fetchSite();
     fetchPost();
-    
+
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [id]);
-
 
   const handleUpdateInfo = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -224,56 +249,72 @@ const InfoEmploye = ({ params }: { params: { id: string } }) => {
     try {
       const response = await axios.put(`http://localhost:8000/api/employees/${id}/`, {
         id: info?.id,
-        personalInfo: {
-          first_name: formData.personalInfo.first_name,
-          last_name: formData.personalInfo.last_name,
-          date_of_birth: formData.personalInfo.date_of_birth,
-          marital_status: formData.personalInfo.marital_status,
-          personal_phone_number: formData.personalInfo.personal_phone_number,
-          personal_email: formData.personalInfo.personal_email,
-          numero_rue: formData.personalInfo.numero_rue,
-          libelle_adresse: formData.personalInfo.libelle_adresse,
-          villeRecord: formData.personalInfo.villeRecord,
-          from: formData.personalInfo.from,
-        },
-        professionalInfo: {
-          badge_number: formData.professionalInfo.badge_number,
-          start_up_date: formData.professionalInfo.start_up_date,
-          category: formData.professionalInfo.category,
-          title_qualification: formData.professionalInfo.title_qualification,
-          work_phone_number: formData.professionalInfo.work_phone_number,
-          work_email: formData.professionalInfo.work_email,
-          site: formData.professionalInfo.site,
-          posts: formData.professionalInfo.post,
-        },
-        financialInfo: {
-          bank_account_number: formData.financialInfo.bank_account_number,
-          bank_account_name: formData.financialInfo.bank_account_name,
-        },
-        additionalInfo: {
-          contact_name: formData.additionalInfo.contact_name,
-          contact_phone_number: formData.additionalInfo.contact_phone_number,
-          salary_scale: formData.additionalInfo.salary_scale,
-          remarques: formData.additionalInfo.remarques,
-        },
+        id_adress: info?.id_adress,
+        first_name: formData.personalInfo.first_name,
+        last_name: formData.personalInfo.last_name,
+        date_of_birth: formData.personalInfo.date_of_birth,
+        marital_status: formData.personalInfo.marital_status,
+        personal_phone_number: formData.personalInfo.personal_phone_number,
+        personal_email: formData.personalInfo.personal_email,
+        badge_number: formData.professionalInfo.badge_number,
+        start_up_date: formData.professionalInfo.start_up_date,
+        category: formData.professionalInfo.category,
+        title_qualification: formData.professionalInfo.title_qualification,
+        work_phone_number: formData.professionalInfo.work_phone_number,
+        work_email: formData.professionalInfo.work_email,
+        site: formData.professionalInfo.site,
+        posts: selectedOptions?.map(element => element.value),
+        bank_account_number: formData.financialInfo.bank_account_number,
+        bank_account_name: formData.financialInfo.bank_account_name,
+        contact_name: formData.additionalInfo.contact_name,
+        contact_phone_number: formData.additionalInfo.contact_phone_number,
+        salary_scale: formData.additionalInfo.salary_scale,
+        remarques: formData.additionalInfo.remarques,
+
       });
 
-      if (response.status !== 200) {
+      const response2 = await axios.post(`http://localhost:3001/api/adresseCtrl/updateadresse`, {
+        id_adresses: info?.id_adress,
+        libelle_adresse: formData.personalInfo.libelle_adresse,
+        numero_rue: formData.personalInfo.numero_rue,
+        villeRecord: formData.personalInfo.villeRecord
+
+      })
+
+
+
+      if (response.status !== 200 || response2.status !== 200) {
         throw new Error(response.data.message || "Une erreur s'est produite");
       }
-
-      // Mise à jour des données locales avec la réponse de l'API
-      setFormData(response.data);
-      setIsSuccess(true);
-      setModalMessage("Les informations ont été modifiées avec succès");
-      setShowModal(true);
+      confirmUpdate();
+      setTimeout(() => {
+        redirect();
+      }, 3000);
+      setFormData((prevState) => ({
+        ...prevState,
+        personalInfo: {
+          ...prevState.personalInfo,
+          ...response2.data,
+        },
+        professionalInfo: {
+          ...prevState.professionalInfo,
+          ...response.data.professionalInfo,
+        },
+        financialInfo: {
+          ...prevState.financialInfo,
+          ...response.data.financialInfo,
+        },
+        additionalInfo: {
+          ...prevState.additionalInfo,
+          ...response.data.additionalInfo,
+        },
+      }));
 
     } catch (error: unknown) {
       // Gérer l'erreur de mise à jour
       setUpdating(false);
-      setModalMessage("Erreur lors de la modification des informations");
-      setShowModal(true);
-      setIsSuccess(false);
+      toast.error("Erreur lors de la modification des informations");
+ 
 
       console.error("Update error:", error);
     } finally {
@@ -554,20 +595,20 @@ const InfoEmploye = ({ params }: { params: { id: string } }) => {
 
                     <div>
                       <Label htmlFor="posts">Postes</Label>
-                      <MultiSelect
-                        options={posts}
-                        onValueChange={(selectedValues) => {
-                          setSelectedPosts(selectedValues);
-                          console.log("Postes sélectionnés :", selectedValues);
-                        }}
-                        placeholder="Sélectionnez des postes"
 
+                      <MultipleSelector
+                        value={selectedOptions}
+                        defaultOptions={posts}
+                        onChange={setSelectedOptions}
+                        hidePlaceholderWhenSelected
+                        placeholder="Selection des postes"
+                        emptyIndicator={
+                          <p className="text-center text-lg leading-10 text-gray-600 dark:text-gray-400 z-index:100">
+                            Plus de poste disponibles
+                          </p>
+                        }
                       />
                     </div>
-
-
-
-
                   </div>
                 </TabsContent>
 
@@ -645,14 +686,40 @@ const InfoEmploye = ({ params }: { params: { id: string } }) => {
                         }
                       />
                     </div>
+
+                    <div>
+                      <Label htmlFor="remarques">Remarques</Label>
+                      <Textarea
+                        id="remarques"
+                        value={formData.additionalInfo.remarques}
+                        onChange={(e) =>
+                          setFormData({
+                            ...formData,
+                            additionalInfo: { ...formData.additionalInfo, salary_scale: e.target.value },
+                          })
+                        }
+                      />
+                    </div>
                   </div>
                 </TabsContent>
               </Tabs>
+              <Button
+                type="submit"
+                className="bg-blue-500 text-white hover:bg-blue-400 mt-5"
+                disabled={updating}
+              >
+                {updating ? (
+                  <>
+                    Modifier   <Loader2 className="animate-spin" />
+                  </>
+                ) : "Modifier"}
+              </Button>
             </form>
           </div>
 
         ) : (<div>Donnees introuvables</div>))
         }
+
       </div>
     </Layout>
   )

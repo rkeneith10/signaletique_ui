@@ -18,7 +18,7 @@ const FinancialInfo = ({
   return (
     <div>
       <h2 className="text-xl font-semibold mb-4">Informations Financières</h2>
-      <div className="space-y-4">
+      <div className="gap-4 grid grid-cols-2">
         <div>
           <Label htmlFor="bank_account_number">Numéro de compte bancaire</Label>
           <Input

@@ -5,6 +5,8 @@ import SearchInput from '@/components/searchInput';
 import { Button } from '@/components/ui/button';
 import { Checkbox } from "@/components/ui/checkbox";
 
+import confirmDelete from '@/components/confirmDelete';
+import SkeletonTable from '@/components/skeletonTable';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -21,7 +23,7 @@ import axios from "axios";
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
 import { FaEdit, FaTrash } from 'react-icons/fa';
-import SkeletonTable from '@/components/skeletonTable';
+import { toast } from 'sonner';
 
 interface Post {
   id: number;
@@ -38,10 +40,7 @@ const Postes = () => {
   const itemsPerPage = 8;
   const totalPages = Math.ceil(postData.length / itemsPerPage)
   const startIndex = (currentPage - 1) * itemsPerPage;
-  const [showModal, setShowModal] = useState<boolean>(false);
   const [showModalDelete, setShowModalDelete] = useState<boolean>(false);
-
-  const [modalMessage, setModalMessage] = useState("")
 
   const filteredInfo = postData.filter((post) =>
     post.post_name ? post.post_name.toLowerCase().includes(searchTerm.toLowerCase()) : false
@@ -58,13 +57,11 @@ const Postes = () => {
   };
   const handleSuccess = () => {
     fetchPost();
-    setShowModal(true)
-    setModalMessage("Le poste a été enregistré avec succès");
+    toast.success("Le poste a été enregistré avec succès");
 
   };
   const handleFailed = () => {
-    setModalMessage("Une erreur est survenue lors de l'ajout");
-    setShowModal(true)
+    toast.error("Une erreur est survenue lors de l'ajout");
   };
   useEffect(() => {
     document.title = "Postes"
@@ -89,14 +86,15 @@ const Postes = () => {
         const idToDelete = checkedItem[0];
         await axios.delete(`http://localhost:8000/api/posts/${idToDelete}/`);
         setPostData(postData.filter((item) => item.id !== idToDelete));
+        confirmDelete()
       } else {
 
         const post_ids = checkedItem;
-        console.log(post_ids)
         await axios.post("http://localhost:8000/api/posts/delete-multiple/", {
           post_ids
         });
         setPostData(postData.filter((item) => !checkedItem.includes(item.id)));
+        confirmDelete()
       }
       setCheckedItem([]);
       setShowModalDelete(false);
@@ -109,7 +107,7 @@ const Postes = () => {
       <div className='mt-2 mr-4 ml-4'>
         {loading ?
           (
-         <SkeletonTable/>
+            <SkeletonTable />
           ) : (
             <>
               <div className="flex flex-col mb-4 bg-white shadow-md rounded-md">
@@ -218,23 +216,7 @@ const Postes = () => {
             </>
           )}
 
-        {showModal && (
-          <AlertDialog open={showModal}>
-            {/* <AlertDialogTrigger>Open</AlertDialogTrigger> */}
-            <AlertDialogContent>
-              <AlertDialogHeader>
-                <AlertDialogTitle>Comfirmation</AlertDialogTitle>
-                <AlertDialogDescription>
-                  {modalMessage}
-                </AlertDialogDescription>
-              </AlertDialogHeader>
-              <AlertDialogFooter>
 
-                <AlertDialogAction onClick={() => setShowModal(false)}>Fermer</AlertDialogAction>
-              </AlertDialogFooter>
-            </AlertDialogContent>
-          </AlertDialog>
-        )}
 
         {showModalDelete && (
           <AlertDialog open={showModalDelete}>

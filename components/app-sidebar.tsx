@@ -15,6 +15,7 @@ import {
 } from "@/components/ui/sidebar";
 import Link from "next/link";
 
+
 // Menu items.
 const items = [
   {
@@ -37,8 +38,6 @@ const items = [
     url: "/employes",
     icon: HiOutlineUserGroup,
   },
-
-
 ]
 
 export function AppSidebar() {

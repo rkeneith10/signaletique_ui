@@ -1,23 +1,25 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import {
-  Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle, DialogTrigger,
-} from "@/components/ui/dialog";
-import {
   AlertDialog,
-  
+
   AlertDialogCancel,
   AlertDialogContent,
   AlertDialogDescription,
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
-  
-} from "@/components/ui/alert-dialog"
+} from "@/components/ui/alert-dialog";
+import {
+  Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger,
+} from "@/components/ui/dialog";
 
 //import { Loader2 } from "lucide-react";
 import axios from "axios";
+import {fetchEmploye} from "../lib/utils"
 import { useRef, useState } from 'react';
 import { FaPlus } from 'react-icons/fa';
+import { toast } from "sonner";
+import confirmAdd from "./confirmAdd";
 import { Button } from './ui/button';
 import AdditionalInfo from "./wizzardComponent/additionalInfo";
 import FinancialInfo from "./wizzardComponent/financialInfo";
@@ -30,6 +32,10 @@ import ProfessionalInfo from "./wizzardComponent/professionalInfo";
 //   nom_champ: string;
 //   message_tooltip: string;
 // }
+
+interface FormModalEmployeProps {
+  onSave: () => void;
+}
 
 interface FormDataType {
 
@@ -87,11 +93,12 @@ interface AdresseAttributes {
 
 }
 
-const FormModalEmploye = () => {
+const FormModalEmploye: React.FC<FormModalEmployeProps>  = ({onSave}) => {
   // const [visibleTooltip, setVisibleTooltip] = useState<string | null>(null);
   // const [tooltips, setTooltips] = useState<Record<string, string>>({});
   //const [adding, setAdding] = useState(false);
   const [currentStep, setCurrentStep] = useState(1);
+  const [open, setOpen] = useState(false)
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [adresse, setAdresse] = useState<AdresseAttributes[]>([]);
   const [isAlertDialogOpen, setAlertDialogOpen] = useState(false);
@@ -156,13 +163,14 @@ const FormModalEmploye = () => {
     }
 
     if (errorMessages.length > 0) {
-      setAlertDialogOpen(true)
-      setAlertMessage(errorMessages.join("\n"));
+      // setAlertDialogOpen(true)
+      // setAlertMessage(errorMessages.join("\n"));
       return false;
     }
 
     return true;
   };
+
 
 
 
@@ -215,8 +223,9 @@ const FormModalEmploye = () => {
           );
 
           if (employeeResponse.status === 201) {
-            setAlertMessage("Enregistrement réussi !");
-            setAlertDialogOpen(true);
+            confirmAdd()
+            setOpen(false)
+            onSave();
           } else {
             // Si le statut n'est pas 201, supprimer l'adresse
             throw new Error("Erreur lors de l'enregistrement de l'employé.");
@@ -265,7 +274,7 @@ const FormModalEmploye = () => {
     if (validateStep()) {
       setCurrentStep((prev) => prev + 1);
     } else {
-      alert("Veuillez remplir tous les champs obligatoires avant de continuer.");
+      toast.error("Veuillez remplir tous les champs obligatoires avant de continuer.");
     }
   };
 
@@ -372,16 +381,14 @@ const FormModalEmploye = () => {
   // }, []);
   return (
     <div>
-      <Dialog>
+      <Dialog open={open} onOpenChange={setOpen}>
         <DialogTrigger asChild>
           <Button className="bg-green-500 text-white px-4 py-2 hover:bg-green-400 font-semibold hover:text-white" variant="outline"> <FaPlus className='mr-2' />Ajouter</Button>
         </DialogTrigger>
         <DialogContent className="sm:max-w-[425px]">
           <DialogHeader>
             <DialogTitle>AJouter Nouveau Poste</DialogTitle>
-            {/* <DialogDescription>
-                Make changes to your profile here. Click save when you are done.
-              </DialogDescription> */}
+         
           </DialogHeader>
 
           <div className="mb-6 flex items-center justify-between">
@@ -401,8 +408,8 @@ const FormModalEmploye = () => {
                 Précédent
               </Button>
             )}
-            <Button onClick={isLastStep ? () => addInfoEmploye() : nextStep}>
-              {isLastStep ? "Soumettre" : "Suivant"}
+            <Button className="bg-blue-500 text-white hover:bg-blue-400" onClick={isLastStep ? () => addInfoEmploye() : nextStep}>
+              {isLastStep ? "Enregistrer" : "Suivant"}
             </Button>
           </div>
         </DialogContent>
@@ -410,19 +417,19 @@ const FormModalEmploye = () => {
 
 
       <AlertDialog open={isAlertDialogOpen}>
-      <AlertDialogContent>
-        <AlertDialogHeader>
-          <AlertDialogTitle>Nofication</AlertDialogTitle>
-          <AlertDialogDescription>
-            {alertMessage}
-          </AlertDialogDescription>
-        </AlertDialogHeader>
-        <AlertDialogFooter>
-          <AlertDialogCancel ref={cancelRef} onClick={() => setAlertDialogOpen(false)}>Cancel</AlertDialogCancel>
-          {/* <AlertDialogAction>Continue</AlertDialogAction> */}
-        </AlertDialogFooter>
-      </AlertDialogContent>
-    </AlertDialog>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Nofication</AlertDialogTitle>
+            <AlertDialogDescription>
+              {alertMessage}
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel ref={cancelRef} onClick={() => setAlertDialogOpen(false)}>Cancel</AlertDialogCancel>
+            {/* <AlertDialogAction>Continue</AlertDialogAction> */}
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
 
     </div>
   )

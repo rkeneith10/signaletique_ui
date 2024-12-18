@@ -19,6 +19,7 @@ import {
 } from "@/components/ui/alert-dialog";
 import { Pagination, PaginationContent, PaginationEllipsis, PaginationItem, PaginationLink, PaginationNext, PaginationPrevious } from "@/components/ui/pagination";
 
+import confirmDelete from '@/components/confirmDelete';
 import {
   Table,
   TableBody,
@@ -39,7 +40,8 @@ import axios from "axios";
 import { ChevronRight } from 'lucide-react';
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
-import { FaEdit, FaTrash } from 'react-icons/fa';
+import { FaEdit, FaFileUpload, FaTrash } from 'react-icons/fa';
+import FileEmploye from '@/components/fileEmploye';
 
 interface Employe {
   id: string;
@@ -88,16 +90,21 @@ const Employes = () => {
   const itemsPerPage = 8;
   const totalPages = Math.ceil(empData.length / itemsPerPage)
   const startIndex = (currentPage - 1) * itemsPerPage;
-  const [showModalMessage, setShowModalMessage] = useState<boolean>(false);
   const [showModalDelete, setShowModalDelete] = useState<boolean>(false);
   const [siteinfo, setSiteInfo] = useState<Site[]>([]);
   const [postInfo, setPostInfo] = useState<Post[]>([])
   //const [modalMessage, setModalMessage] = useState("")
   const [showDetailEmp, setShowDetailEmp] = useState<boolean>(false);
+  const [addFile,setAddFile] = useState<boolean>(false)
 
-  const filteredInfo = empData.filter((emp) =>
-    emp.first_name ? emp.first_name.toLowerCase().includes(searchTerm.toLowerCase()) : false
-  );
+  const filteredInfo = empData.filter((emp) => {
+
+    const firstNameMatch = emp.first_name?.toLowerCase().includes(searchTerm.toLowerCase());
+    const lastNameMatch = emp.last_name?.toLowerCase().includes(searchTerm.toLowerCase());
+
+    return firstNameMatch || lastNameMatch; // Retourne true si l'un des deux correspond
+  });
+
 
 
   const handlePageChange = (page: number) => {
@@ -110,19 +117,15 @@ const Employes = () => {
 
 
   }
+
+  const addFileEmp=(employe:Employe)=>{
+    setSelectedEmp(employe)
+    setAddFile(true)
+  }
   const handleChangeCheck = (id: string) => {
     setCheckedItem((prev) => (prev === id ? null : id));
   };
-  // const handleSuccess = () => {
-  //   fetchEmploye();
-  //   setShowModal(true)
-  //   setModalMessage("Le poste a été enregistré avec succès");
 
-  // };
-  // const handleFailed = () => {
-  //   setModalMessage("Une erreur est survenue lors de l'ajout");
-  //   setShowModal(true)
-  // };
   useEffect(() => {
     document.title = "Employes"
     fetchEmploye();
@@ -149,7 +152,7 @@ const Employes = () => {
 
         const idToDelete = checkedItem;
         await axios.delete(`http://localhost:8000/api/employees/${idToDelete}/`);
-        setShowModalMessage(true);
+        confirmDelete()
         setEmpData(empData.filter((item) => item.id !== idToDelete));
       }
       setCheckedItem(null);
@@ -187,6 +190,9 @@ const Employes = () => {
     const post = postInfo.find((p) => p.id === String(id));
     return post ? post.post_name : "Inconnu";
   };
+  const handleAfterSave = () => {
+    fetchEmploye();
+  };
 
 
   return (
@@ -204,7 +210,7 @@ const Employes = () => {
 
                     <div className='flex flex-row items-center space-x-4 mb-4'>
 
-                      <FormModalEmploye />
+                      <FormModalEmploye onSave={handleAfterSave} />
                       <Link href={`/employes/${checkedItem}`} className='flex items-center '>
                         <Button
                           disabled={!checkedItem}
@@ -230,16 +236,15 @@ const Employes = () => {
                   </div>
 
                   <div className='mt-6'>
-                    <div className=" ">
+                    <div className=" overflow-x-auto">
                       <Table className="min-w-[1200px]">
                         <TableHeader>
                           <TableRow>
                             <TableHead></TableHead>
                             <TableHead className="uppercase font-bold text-gray-900">#</TableHead>
-                            <TableHead className="uppercase font-bold text-gray-900">Prenom</TableHead>
-                            <TableHead className="uppercase font-bold text-gray-900">Nom</TableHead>
-                            <TableHead className="uppercase font-bold text-gray-900">Telephone personnel</TableHead>
-                            <TableHead className="uppercase font-bold text-gray-900">Email Personnel</TableHead>
+                            <TableHead className="uppercase font-bold text-gray-900">Nom complet</TableHead>
+                            {/* <TableHead className="uppercase font-bold text-gray-900">Telephone personnel</TableHead>
+                            <TableHead className="uppercase font-bold text-gray-900">Email Personnel</TableHead> */}
                             <TableHead className="uppercase font-bold text-gray-900">Telephone travail</TableHead>
                             <TableHead className="uppercase font-bold text-gray-900">Email travail</TableHead>
                             <TableHead className="uppercase font-bold text-gray-900">Numero Badge</TableHead>
@@ -247,6 +252,7 @@ const Employes = () => {
                             <TableHead className="uppercase font-bold text-gray-900">Numero de contact</TableHead>
                             <TableHead className="uppercase font-bold text-gray-900">Site</TableHead>
                             <TableHead className="uppercase font-bold text-gray-900">Postes</TableHead>
+                            <TableHead className="font-bold text-gray-900"></TableHead>
                             <TableHead className="font-bold text-gray-900"></TableHead>
                           </TableRow>
                         </TableHeader>
@@ -262,10 +268,9 @@ const Employes = () => {
                                 />
                               </TableCell>
                               <TableCell>{index + 1}</TableCell>
-                              <TableCell>{item.first_name}</TableCell>
-                              <TableCell>{item.last_name}</TableCell>
-                              <TableCell>{item.personal_phone_number}</TableCell>
-                              <TableCell>{item.personal_email}</TableCell>
+                              <TableCell>{`${item.first_name} ${item.last_name}`}</TableCell>
+                              {/* <TableCell>{item.personal_phone_number}</TableCell>
+                              <TableCell>{item.personal_email}</TableCell> */}
                               <TableCell>{item.work_phone_number}</TableCell>
                               <TableCell>{item.work_email}</TableCell>
                               <TableCell>{item.badge_number}</TableCell>
@@ -275,6 +280,29 @@ const Employes = () => {
                               <TableCell>
                                 {item.posts.map((id) => getPostByID(id)).join(", ")}
                               </TableCell>
+                              <TableCell>
+                                <TooltipProvider>
+                                  <Tooltip>
+                                    <TooltipTrigger asChild>
+                                     <Link href={`/addFileEmploye/${item.id}`}>
+                                     <Button
+                                        variant="outline"
+                                        className="group hover:bg-blue-500"
+                                        size="icon"
+                                        // onClick={() => addFileEmp(item)}
+                                      >
+                                        <FaFileUpload className="group-hover:text-white transition-colors duration-200" />
+                                      </Button>
+                                     </Link>
+                                    </TooltipTrigger>
+                                    <TooltipContent>
+                                      <p>Ajouter les fichiers</p>
+                                    </TooltipContent>
+                                  </Tooltip>
+                                </TooltipProvider>
+                              </TableCell>
+
+
                               <TableCell>
                                 <TooltipProvider>
                                   <Tooltip>
@@ -342,21 +370,7 @@ const Employes = () => {
           )}
 
 
-        <AlertDialog open={showModalMessage}>
 
-          <AlertDialogContent>
-            <AlertDialogHeader>
-              <AlertDialogTitle>Comfirmation</AlertDialogTitle>
-              <AlertDialogDescription>
-                Suppression reussie
-              </AlertDialogDescription>
-            </AlertDialogHeader>
-            <AlertDialogFooter>
-
-              <AlertDialogAction onClick={() => setShowModalMessage(false)}>Fermer</AlertDialogAction>
-            </AlertDialogFooter>
-          </AlertDialogContent>
-        </AlertDialog>
 
 
         {showModalDelete && (
@@ -387,6 +401,14 @@ const Employes = () => {
             onClose={() => setShowDetailEmp(false)}
             employe={selectedEmp}
 
+          />
+        )}
+
+        {addFile && (
+          <FileEmploye
+          isOpen={addFile}
+            onClose={() => setAddFile(false)}
+            employe={selectedEmp} 
           />
         )}
 

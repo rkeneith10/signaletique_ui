@@ -1,5 +1,5 @@
 "use client";
-
+import { Toaster } from "@/components/ui/sonner"
 import { AppSidebar } from "@/components/app-sidebar";
 import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 import { Inter } from "next/font/google";
@@ -34,6 +34,7 @@ const Layout: React.FC<LayoutProps> = ({ children, isAuthenticated }) => {
                 )}
                 {!isAuthenticated && children}
               </main>
+              <Toaster position="top-right" richColors/>
             </div>
           </div>
         </SidebarProvider>

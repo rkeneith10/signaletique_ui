@@ -1,15 +1,16 @@
 "use client";
+import confirmUpdate from '@/components/confirmUpdate';
 import Layout from '@/components/rootLayout';
-import { AlertDialog, AlertDialogAction, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle,  } from '@/components/ui/alert-dialog';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import axios from 'axios';
 import { Loader2 } from 'lucide-react';
+import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { FaQuestionCircle } from 'react-icons/fa';
-import { useRouter } from 'next/navigation';
+import { toast } from 'sonner';
 
 
 
@@ -31,6 +32,7 @@ const DetailPost = ({ params }: { params: { id: string } }) => {
   const [visibleTooltip, setVisibleTooltip] = useState<string | null>(null);
   const [tooltips, setTooltips] = useState<Record<string, string>>({});
   const [updating, setUpdating] = useState<boolean>(false);
+  const [info, setInfo] = useState<Post>();
 
 
 
@@ -46,10 +48,8 @@ const DetailPost = ({ params }: { params: { id: string } }) => {
   const handleTooltipHide = () => {
     setVisibleTooltip(null);
   };
-  const [isSuccess, setIsSuccess] = useState<boolean>(false);
-  const [showModal, setShowModal] = useState<boolean>(false);
-  const [modalMessage, setModalMessage] = useState("");
-  const [info, setInfo] = useState<Post>();
+
+
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [formData, setFormData] = useState<any>({
@@ -57,8 +57,8 @@ const DetailPost = ({ params }: { params: { id: string } }) => {
     post_description: "",
 
   });
+
   const redirect = () => {
-    setShowModal(false);
     router.push('/postes')
   }
 
@@ -127,16 +127,17 @@ const DetailPost = ({ params }: { params: { id: string } }) => {
 
       // Mise à jour des données avec la réponse de l'API
       setFormData(response.data);
-      setIsSuccess(true);
-      setModalMessage("Les informations ont été modifiées avec succès");
-      setShowModal(true);
+
+      confirmUpdate()
+      setTimeout(() => {
+        redirect();
+      }, 3000);
 
     } catch (error: unknown) {
       // Gérer l'erreur de mise à jour
       setUpdating(false);
-      setModalMessage(`Erreur lors de la modification des informations`);
-      setShowModal(true);
-      setIsSuccess(false);
+      toast.error(`Erreur lors de la modification des informations`);
+
 
       console.error("Update error:", error);
     } finally {
@@ -233,21 +234,7 @@ const DetailPost = ({ params }: { params: { id: string } }) => {
           )
         )}
 
-        <AlertDialog open={showModal}>
-          {/* <AlertDialogTrigger>Open</AlertDialogTrigger> */}
-          <AlertDialogContent>
-            <AlertDialogHeader>
-              <AlertDialogTitle>{isSuccess ? "Succès" : "Erreur"}</AlertDialogTitle>
-              <AlertDialogDescription>
-                {modalMessage}
-              </AlertDialogDescription>
-            </AlertDialogHeader>
-            <AlertDialogFooter>
 
-              <AlertDialogAction onClick={() => redirect()}>Fermer</AlertDialogAction>
-            </AlertDialogFooter>
-          </AlertDialogContent>
-        </AlertDialog>
       </div>
     </Layout>
   )

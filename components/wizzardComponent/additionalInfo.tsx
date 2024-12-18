@@ -18,7 +18,7 @@ const AdditionalInfo = ({
   return (
     <div>
       <h2 className="text-xl font-semibold mb-4">Informations Complémentaires</h2>
-      <div className="space-y-4">
+      <div className="gap-4 grid grid-cols-2">
       <div>
           <Label htmlFor="salary_scale">Grille salariale</Label>
           <Input
