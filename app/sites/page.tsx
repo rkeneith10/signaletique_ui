@@ -23,6 +23,7 @@ import axios from "axios";
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
 import { FaEdit, FaTrash } from 'react-icons/fa';
+import { toast } from 'sonner';
 
 interface Site {
   id: number;
@@ -62,12 +63,12 @@ const Sites = () => {
   const handleSuccess = () => {
     fetchPost();
     setShowModal(true)
-    setModalMessage("Le site a été enregistré avec succès");
+    toast.success("Le site a été enregistré avec succès");
 
   };
   const handleFailed = () => {
-    setModalMessage("Une erreur est survenue lors de l'ajout");
-    setShowModal(true)
+    toast.error("Une erreur est survenue lors de l'ajout");
+  
   };
   useEffect(() => {
     document.title = "Sites"

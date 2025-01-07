@@ -8,15 +8,15 @@ import {
   AvatarFallback,
   AvatarImage,
 } from "@/components/ui/avatar";
-import { Button } from "@/components/ui/button";
+//import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import axios from "axios";
-import Link from "next/link";
+//import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
-import { FaEdit, FaFilePdf, FaImage, FaTrash, FaUserCircle } from "react-icons/fa";
-import { Document, Page, pdfjs } from 'react-pdf';
+import {  FaFilePdf, FaImage, FaUserCircle } from "react-icons/fa";
+import { pdfjs } from 'react-pdf';
 import { toast } from "sonner";
 pdfjs.GlobalWorkerOptions.workerSrc = new URL(
   'pdfjs-dist/build/pdf.worker.min.mjs',
@@ -33,9 +33,9 @@ const AddFileEmploye = ({ params }: { params: { id: string } }) => {
   const [fileData, setFileData] = useState<any[]>([]);
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [infoEmp, setInfoEmp] = useState<any | null>(null);
-  const [selectedPdf, setSelectedPdf] = useState<string | null>(null);
   const [selectedImage, setSelectedImage] = useState<string | null>(null); // Aperçu image
   const fileInputRef = useRef<HTMLInputElement>(null); // Référence pour input file
+  const [checkedItem,setCheckedItem] = useState<string | null>(null);
 
   useEffect(() => {
     document.title = infoEmp
@@ -43,12 +43,10 @@ const AddFileEmploye = ({ params }: { params: { id: string } }) => {
       : "Détails de l'employé";
   }, [infoEmp]);
 
-  useEffect(() => {
-    if (selectedPdf) {
-      console.log("Nouveau fichier PDF sélectionné :", selectedPdf);
-    }
-  }, [selectedPdf]);
 
+  const handleChangeCheck = (id: string) => {
+    setCheckedItem((prev) => (prev === id ? null : id));
+  };
 
   const fetchFile = async () => {
     try {
@@ -87,6 +85,13 @@ const AddFileEmploye = ({ params }: { params: { id: string } }) => {
   const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
       const file = e.target.files[0];
+      const allowedTypes = ["image/png", "image/jpeg", "image/jpg"];
+
+      // Vérification du type de fichier
+      if (!allowedTypes.includes(file.type)) {
+        toast.error("Veuillez sélectionner un fichier au format PNG, JPEG ou JPG.");
+        return;
+      }
       const formData = new FormData();
       formData.append("photo", file);
 
@@ -96,9 +101,9 @@ const AddFileEmploye = ({ params }: { params: { id: string } }) => {
           formData
         );
         toast.success("Photo de profil mise à jour");
-        const uploadedImageUrl = response.data.photo_url; // Assurez-vous que le backend retourne l'URL finale
-        setSelectedImage(uploadedImageUrl); // Utilisez l'URL retournée
-        fetchEmploye(); // Rafraîchir les données de l'employé
+        const uploadedImageUrl = response.data.photo_url; 
+        setSelectedImage(uploadedImageUrl); 
+        fetchEmploye(); 
       } catch (error) {
         toast.error("Erreur lors du téléchargement de la photo");
         console.error("Erreur lors du téléchargement :", error);
@@ -160,10 +165,10 @@ const AddFileEmploye = ({ params }: { params: { id: string } }) => {
               <div className="">
                 <div className='flex flex-row items-center space-x-4 mb-4 p-4'>
 
-                  <FormModalDossierEmp onSuccess={handleSuccess} onFailed={handleFailed} onFailedType={handleFailedType} />
-                  <Link href="/" className='flex items-center '>
+                  <FormModalDossierEmp employeeId={id} onSuccess={handleSuccess} onFailed={handleFailed} onFailedType={handleFailedType} />
+                  {/* <Link href="/" className='flex items-center '>
                     <Button
-                      //disabled={checkedItem.length !== 1} // Actif uniquement si une seule ligne est sélectionnée
+                      disabled={!checkedItem} // Actif uniquement si une seule ligne est sélectionnée
                       className='bg-blue-500 text-white px-4 py-2 hover:bg-blue-400 font-semibold'
                     >
                       <FaEdit className='mr-2' />
@@ -172,13 +177,13 @@ const AddFileEmploye = ({ params }: { params: { id: string } }) => {
                   </Link>
 
                   <Button
-                    //disabled={checkedItem.length === 0} // Actif si au moins une ligne est sélectionnée
+                    disabled={!checkedItem} 
                     //onClick={() => setShowModalDelete(true)}
                     className='bg-red-500 text-white px-4 py-2 hover:bg-red-400 flex items-center font-semibold'
                   >
                     <FaTrash className='mr-2' />
                     <span>Supprimer</span>
-                  </Button>
+                  </Button> */}
                 </div>
                 <div className='mt-6'>
                   <Table>
@@ -196,8 +201,8 @@ const AddFileEmploye = ({ params }: { params: { id: string } }) => {
                         <TableRow key={item.id}>
                           <TableCell>
                             <Checkbox
-                            // checked={checkedItem.includes(item.id)}
-                            // onCheckedChange={() => handleChangeCheck(item.id)}
+                            checked={checkedItem===item.id}
+                            onCheckedChange={() => handleChangeCheck(item.id)}
                             />
                           </TableCell>
                           <TableCell>{index + 1}</TableCell>

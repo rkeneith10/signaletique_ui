@@ -118,10 +118,6 @@ const Employes = () => {
 
   }
 
-  const addFileEmp=(employe:Employe)=>{
-    setSelectedEmp(employe)
-    setAddFile(true)
-  }
   const handleChangeCheck = (id: string) => {
     setCheckedItem((prev) => (prev === id ? null : id));
   };
@@ -368,10 +364,6 @@ const Employes = () => {
               </div>
             </>
           )}
-
-
-
-
 
         {showModalDelete && (
           <AlertDialog open={showModalDelete}>
