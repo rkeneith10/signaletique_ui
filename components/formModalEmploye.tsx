@@ -15,7 +15,6 @@ import {
 
 //import { Loader2 } from "lucide-react";
 import axios from "axios";
-import {fetchEmploye} from "../lib/utils"
 import { useRef, useState } from 'react';
 import { FaPlus } from 'react-icons/fa';
 import { toast } from "sonner";
@@ -49,6 +48,7 @@ interface FormDataType {
     numero_rue: string;
     libelle_adresse: string;
     villeRecord: string;
+    section_communale: string;
     from: string;
   };
   professionalInfo: {
@@ -93,7 +93,7 @@ interface AdresseAttributes {
 
 }
 
-const FormModalEmploye: React.FC<FormModalEmployeProps>  = ({onSave}) => {
+const FormModalEmploye: React.FC<FormModalEmployeProps> = ({ onSave }) => {
   // const [visibleTooltip, setVisibleTooltip] = useState<string | null>(null);
   // const [tooltips, setTooltips] = useState<Record<string, string>>({});
   //const [adding, setAdding] = useState(false);
@@ -115,6 +115,7 @@ const FormModalEmploye: React.FC<FormModalEmployeProps>  = ({onSave}) => {
       numero_rue: "",
       libelle_adresse: "",
       villeRecord: "",
+      section_communale: "",
       from: "Signaletique"
     },
     professionalInfo: {
@@ -187,12 +188,12 @@ const FormModalEmploye: React.FC<FormModalEmployeProps>  = ({onSave}) => {
 
   const addInfoEmploye = async () => {
 
-    const { numero_rue, libelle_adresse, villeRecord, from } = formData.personalInfo;
+    const { numero_rue, libelle_adresse, villeRecord, section_communale, from } = formData.personalInfo;
 
     // Enregistrer l'adresse
     const adresseResponse = await axios.post(
       "http://localhost:3001/api/adresseCtrl",
-      { numero_rue, libelle_adresse, statut: "En creation", villeRecord, from },
+      { numero_rue, libelle_adresse, statut: "En creation", villeRecord, section_communale, from },
       { headers: { "Content-Type": "application/json" } }
     );
 
@@ -388,7 +389,7 @@ const FormModalEmploye: React.FC<FormModalEmployeProps>  = ({onSave}) => {
         <DialogContent className="sm:max-w-[425px]">
           <DialogHeader>
             <DialogTitle>AJouter Nouveau Poste</DialogTitle>
-         
+
           </DialogHeader>
 
           <div className="mb-6 flex items-center justify-between">

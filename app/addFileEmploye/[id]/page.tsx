@@ -15,7 +15,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import axios from "axios";
 //import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
-import {  FaFilePdf, FaImage, FaUserCircle } from "react-icons/fa";
+import { FaFilePdf, FaImage, FaUserCircle } from "react-icons/fa";
 import { pdfjs } from 'react-pdf';
 import { toast } from "sonner";
 pdfjs.GlobalWorkerOptions.workerSrc = new URL(
@@ -35,7 +35,7 @@ const AddFileEmploye = ({ params }: { params: { id: string } }) => {
   const [infoEmp, setInfoEmp] = useState<any | null>(null);
   const [selectedImage, setSelectedImage] = useState<string | null>(null); // Aperçu image
   const fileInputRef = useRef<HTMLInputElement>(null); // Référence pour input file
-  const [checkedItem,setCheckedItem] = useState<string | null>(null);
+  const [checkedItem, setCheckedItem] = useState<string | null>(null);
 
   useEffect(() => {
     document.title = infoEmp
@@ -50,7 +50,7 @@ const AddFileEmploye = ({ params }: { params: { id: string } }) => {
 
   const fetchFile = async () => {
     try {
-      const response = await axios.get(`http://localhost:8000/api/files/by-employee/${id}`);
+      const response = await axios.get(`${process.env.NEXT_PUBLIC_API_BASE_URL}/files/by-employee/${id}`);
       setFileData(response.data);
     } catch (error) {
       console.log(error);
@@ -59,7 +59,7 @@ const AddFileEmploye = ({ params }: { params: { id: string } }) => {
 
   const fetchEmploye = async () => {
     try {
-      const response = await axios.get(`http://localhost:8000/api/employees/${id}`);
+      const response = await axios.get(`${process.env.NEXT_PUBLIC_API_BASE_URL}/employees/${id}`);
       setInfoEmp(response.data);
       if (response.data.photo) {
         setSelectedImage(response.data.photo); // Mettre à jour l'image
@@ -97,13 +97,13 @@ const AddFileEmploye = ({ params }: { params: { id: string } }) => {
 
       try {
         const response = await axios.post(
-          `http://localhost:8000/api/employees/${id}/upload-photo/`,
+          `${process.env.NEXT_PUBLIC_API_BASE_URL}/employees/${id}/upload-photo/`,
           formData
         );
         toast.success("Photo de profil mise à jour");
-        const uploadedImageUrl = response.data.photo_url; 
-        setSelectedImage(uploadedImageUrl); 
-        fetchEmploye(); 
+        const uploadedImageUrl = response.data.photo_url;
+        setSelectedImage(uploadedImageUrl);
+        fetchEmploye();
       } catch (error) {
         toast.error("Erreur lors du téléchargement de la photo");
         console.error("Erreur lors du téléchargement :", error);
@@ -197,12 +197,19 @@ const AddFileEmploye = ({ params }: { params: { id: string } }) => {
                       </TableRow>
                     </TableHeader>
                     <TableBody>
-                      {fileData.map((item, index) => (
+                      {fileData.length===0 ? (
+                       <TableRow>
+                       <TableCell colSpan={4} className="text-center text-gray-800 font-semibold">
+                         Aucun dossier disponible pour cet employé.
+                       </TableCell>
+                     </TableRow>
+                      ) : 
+                      fileData.map((item, index) => (
                         <TableRow key={item.id}>
                           <TableCell>
                             <Checkbox
-                            checked={checkedItem===item.id}
-                            onCheckedChange={() => handleChangeCheck(item.id)}
+                              checked={checkedItem === item.id}
+                              onCheckedChange={() => handleChangeCheck(item.id)}
                             />
                           </TableCell>
                           <TableCell>{index + 1}</TableCell>
@@ -223,7 +230,8 @@ const AddFileEmploye = ({ params }: { params: { id: string } }) => {
                           </TableCell>
 
                         </TableRow>
-                      ))}
+                      ))
+                       }
                     </TableBody>
                   </Table>
                   {/* <Pagination>

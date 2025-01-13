@@ -106,7 +106,7 @@ const FormModalPoste: React.FC<PostModalProps> = ({ onSuccess, onFailed }) => {
 
         const nom_application = "Signaletique";
 
-        const response = await axios.get(`/api/tooltipCtrl?nom_application=${encodeURIComponent(nom_application)}`);
+        const response = await axios.get(`http://localhost:3001/api/tooltipCtrl?nom_application=${encodeURIComponent(nom_application)}`);
 
         const tooltipMap: Record<string, string> = {};
         const tooltips = response.data.tooltip;

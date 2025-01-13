@@ -67,7 +67,7 @@ const DetailSite = ({ params }: { params: { id: string } }) => {
     const fetchInfo = async () => {
       setLoading(true);
       try {
-        const response = await axios.get(`http://localhost:8000/api/sites/${id}`);
+        const response = await axios.get(`${process.env.NEXT_PUBLIC_API_BASE_URL}/sites/${id}`);
         setInfo(response.data);
         setFormData({
           site_name: response.data.site_name,
@@ -115,7 +115,7 @@ const DetailSite = ({ params }: { params: { id: string } }) => {
     setUpdating(true);
 
     try {
-      const response = await axios.put(`http://localhost:8000/api/sites/${id}/`, {
+      const response = await axios.put(`${process.env.NEXT_PUBLIC_API_BASE_URL}/sites/${id}/`, {
         id: info?.id,
         site_name: formData.site_name,
         adresse: formData.adresse,

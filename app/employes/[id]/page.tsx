@@ -140,7 +140,7 @@ const InfoEmploye = ({ params }: { params: { id: string } }) => {
     const fetchEmployeeInfo = async () => {
       setLoading(true);
       try {
-        const response = await axios.get(`http://localhost:8000/api/employees/${id}/`);
+        const response = await axios.get(`${process.env.NEXT_PUBLIC_API_BASE_URL}/employees/${id}/`);
         setInfo(response.data);
 
         const response2 = await axios.get(`http://localhost:3001/api/adresseCtrl/${response.data.id_adress}`);
@@ -196,7 +196,7 @@ const InfoEmploye = ({ params }: { params: { id: string } }) => {
 
     const fetchSite = async () => {
       try {
-        const response = await axios.get('http://localhost:8000/api/sites/');
+        const response = await axios.get(`${process.env.NEXT_PUBLIC_API_BASE_URL}/sites/`);
         console.log(response)
         setSite(response.data);
       } catch (error) {
@@ -207,7 +207,7 @@ const InfoEmploye = ({ params }: { params: { id: string } }) => {
 
     const fetchPost = async () => {
       try {
-        const response = await axios.get('http://localhost:8000/api/posts/');
+        const response = await axios.get(`${process.env.NEXT_PUBLIC_API_BASE_URL}/posts/`);
         const data = response.data;
 
 
@@ -217,7 +217,7 @@ const InfoEmploye = ({ params }: { params: { id: string } }) => {
         }));
 
         setPosts(options);
-        const responseEmp = await axios.get(`http://localhost:8000/api/employees/${id}/`);
+        const responseEmp = await axios.get(`${process.env.NEXT_PUBLIC_API_BASE_URL}/employees/${id}/`);
         console.log(responseEmp.data.posts)
         const selectPost: Option[] = [];
         responseEmp.data?.posts?.forEach((p: string) => {
@@ -247,7 +247,7 @@ const InfoEmploye = ({ params }: { params: { id: string } }) => {
     setUpdating(true);
 
     try {
-      const response = await axios.put(`http://localhost:8000/api/employees/${id}/`, {
+      const response = await axios.put(`${process.env.NEXT_PUBLIC_API_BASE_URL}/employees/${id}/`, {
         id: info?.id,
         id_adress: info?.id_adress,
         first_name: formData.personalInfo.first_name,

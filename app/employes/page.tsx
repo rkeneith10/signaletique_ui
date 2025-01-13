@@ -133,10 +133,10 @@ const Employes = () => {
   const fetchEmploye = async () => {
     setLoading(true);
     try {
-      const response = await axios.get("http://localhost:8000/api/employees");
+      const response = await axios.get(`${process.env.NEXT_PUBLIC_API_BASE_URL}/employees`);
       setEmpData(response.data);
     } catch (error) {
-      console.error("Erreur lors de la récupération des postes :", error);
+      console.error("Erreur lors de la récupération  :", error);
     } finally {
       setLoading(false);
     }
@@ -147,7 +147,7 @@ const Employes = () => {
       if (checkedItem) {
 
         const idToDelete = checkedItem;
-        await axios.delete(`http://localhost:8000/api/employees/${idToDelete}/`);
+        await axios.delete(`${process.env.NEXT_PUBLIC_API_BASE_URL}/employees/${idToDelete}/`);
         confirmDelete()
         setEmpData(empData.filter((item) => item.id !== idToDelete));
       }
@@ -160,7 +160,7 @@ const Employes = () => {
 
   const fetchSite = async () => {
     try {
-      const response = await axios.get("http://localhost:8000/api/sites/");
+      const response = await axios.get(`${process.env.NEXT_PUBLIC_API_BASE_URL}/sites/`);
       setSiteInfo(response.data);
     } catch (error) {
       console.error("Erreur lors de la récupération  :", error);
@@ -169,7 +169,7 @@ const Employes = () => {
 
   const fetchPost = async () => {
     try {
-      const response = await axios.get("http://localhost:8000/api/posts/");
+      const response = await axios.get(`${process.env.NEXT_PUBLIC_API_BASE_URL}/posts/`);
       setPostInfo(response.data);
     } catch (error) {
       console.error("Erreur lors de la récupération  :", error);

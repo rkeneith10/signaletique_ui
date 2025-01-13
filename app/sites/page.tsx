@@ -44,7 +44,7 @@ const Sites = () => {
   const [showModal, setShowModal] = useState<boolean>(false);
   const [showModalDelete, setShowModalDelete] = useState<boolean>(false);
 
-  const [modalMessage, setModalMessage] = useState("")
+  const [modalMessage] = useState("")
 
   const filteredInfo = siteData.filter((st) =>
     st.site_name ? st.site_name.toLowerCase().includes(searchTerm.toLowerCase()) : false
@@ -77,7 +77,7 @@ const Sites = () => {
   const fetchPost = async () => {
     setLoading(true);
     try {
-      const response = await axios.get("http://localhost:8000/api/sites");
+      const response = await axios.get(`${process.env.NEXT_PUBLIC_API_BASE_URL}/sites`);
       setSiteData(response.data);
     } catch (error) {
       console.error("Erreur lors de la récupération des sites :", error);
@@ -91,13 +91,13 @@ const Sites = () => {
       if (checkedItem.length === 1) {
 
         const idToDelete = checkedItem[0];
-        await axios.delete(`http://localhost:8000/api/sites/${idToDelete}/`);
+        await axios.delete(`${process.env.NEXT_PUBLIC_API_BASE_URL}/sites/${idToDelete}/`);
         setSiteData(siteData.filter((item) => item.id !== idToDelete));
       } else {
 
         const site_ids = checkedItem;
 
-        await axios.post("http://localhost:8000/api/sites/delete-multiple/", {
+        await axios.post(`${process.env.NEXT_PUBLIC_API_BASE_URL}/sites/delete-multiple/`, {
           site_ids
         });
         setSiteData(siteData.filter((item) => !checkedItem.includes(item.id)));

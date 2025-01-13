@@ -7,6 +7,7 @@ import {
   SidebarContent,
   SidebarGroup,
   SidebarGroupContent,
+  SidebarFooter,
   SidebarGroupLabel,
   SidebarHeader,
   SidebarMenu,
@@ -14,7 +15,7 @@ import {
   SidebarMenuItem,
 } from "@/components/ui/sidebar";
 import Link from "next/link";
-
+import { NavUser } from "@/components/nav-user"
 
 // Menu items.
 const items = [
@@ -66,7 +67,9 @@ export function AppSidebar() {
 
         </SidebarGroup>
       </SidebarContent>
-
+      <SidebarFooter>
+        <NavUser/>
+      </SidebarFooter>
     </Sidebar>
   )
 }

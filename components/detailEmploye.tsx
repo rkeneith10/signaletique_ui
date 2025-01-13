@@ -58,7 +58,7 @@ interface AdresseEmp {
   numero_rue: string;
   libelle_adresse: string;
   statut: string;
-  id_sectioncommunale?: number;
+  section_communale: string;
   villeRecord?: string;
   code_postal?: string;
   cle_unicite: string;
@@ -151,7 +151,7 @@ const DetailEmploye: React.FC<DetailEmploye> = ({ isOpen, onClose, employe }) =>
                       <strong>Statut matrimonial:</strong> {employe.marital_status || 'N/A'}
                     </div>
                     <div className="text-gray-900">
-                      <strong>Adresse:</strong>  {adresseInfo ? `${adresseInfo.numero_rue} ${adresseInfo.libelle_adresse}, ${adresseInfo.villeRecord}` : 'N/A'}
+                      <strong>Adresse:</strong>  {adresseInfo ? `${adresseInfo.numero_rue} ${adresseInfo.libelle_adresse}, ${adresseInfo.villeRecord}, ${adresseInfo.section_communale}` : 'N/A'}
 
                     </div>
 

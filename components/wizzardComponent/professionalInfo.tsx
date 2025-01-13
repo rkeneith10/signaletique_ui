@@ -13,7 +13,15 @@ import {
 } from "@/components/ui/select";
 import axios from "axios";
 import { useEffect, useState } from "react";
+import { FaQuestionCircle } from "react-icons/fa";
 import { MultiSelect } from "../multiSelect";
+
+interface TooltipAttributes {
+  id_tooltip: number;
+  nom_application: string;
+  nom_champ: string;
+  message_tooltip: string;
+}
 
 interface Sites {
   id: string,
@@ -47,12 +55,14 @@ const ProfessionalInfo = ({ data, onChange, }: { data: any; onChange: (data: any
 
   const handleSiteChange = (value: string) => {
     setSelectedSite(value);
-    onChange({ site: value });  
+    onChange({ site: value });
   };
 
 
   const [site, setSite] = useState<Sites[]>([])
   const [poste, setPoste] = useState<Postes[]>([])
+  const [visibleTooltip, setVisibleTooltip] = useState<string | null>(null);
+  const [tooltips, setTooltips] = useState<Record<string, string>>({});
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     onChange({ [e.target.id]: e.target.value });
@@ -79,13 +89,60 @@ const ProfessionalInfo = ({ data, onChange, }: { data: any; onChange: (data: any
     fectchSite();
     fectchPost();
   }, [])
+
+  const handleTooltipToggle = (field: string) => {
+    setVisibleTooltip(field);
+  };
+
+  const handleTooltipHide = () => {
+    setVisibleTooltip(null);
+  };
+
+  useEffect(() => {
+    const fetchTooltips = async () => {
+      try {
+
+        const nom_application = "Signaletique";
+
+        const response = await axios.get(`http://localhost:3001/api/tooltipCtrl?nom_application=${encodeURIComponent(nom_application)}`);
+
+        const tooltipMap: Record<string, string> = {};
+        const tooltips = response.data.tooltip;
+
+        tooltips.forEach((tooltip: TooltipAttributes) => {
+          tooltipMap[tooltip.nom_champ] = tooltip.message_tooltip;
+        });
+
+        setTooltips(tooltipMap);
+      } catch (error) {
+        console.error('Erreur lors de la récupération des tooltips:', error);
+      }
+    };
+
+    fetchTooltips();
+  }, []);
+
   return (
     <div>
       <h2 className="text-xl font-semibold mb-4">Informations Professionnelles</h2>
       <div className="gap-4 grid grid-cols-2">
 
         <div>
-          <Label htmlFor="badge_number">Numéro de badge</Label>
+          <Label htmlFor="badge_number">Numéro de badge
+            <div
+              className="ml-2 inline-block cursor-pointer relative"
+              onMouseEnter={() => handleTooltipToggle('badge_number')}
+              onMouseLeave={handleTooltipHide}
+            >
+              <FaQuestionCircle className="text-gray-500" size={15} />
+              {visibleTooltip === 'badge_number' && (
+                <div className="absolute z-10 bg-gray-900 text-white text-md rounded-lg shadow-lg p-3 -top-12 left-1/2 transform -translate-x-1/2 w-72 text-center">
+                  {tooltips['badge_number']}
+                  <div className="absolute left-1/2 transform -translate-x-1/2 w-2.5 h-2.5 bg-gray-900 rotate-45 bottom-[-5px]"></div>
+                </div>
+              )}
+            </div>
+          </Label>
           <Input
             id="badge_number"
             value={data.badge_number}
@@ -95,7 +152,21 @@ const ProfessionalInfo = ({ data, onChange, }: { data: any; onChange: (data: any
         </div>
 
         <div>
-          <Label htmlFor="start_up_date">Date de début</Label>
+          <Label htmlFor="start_up_date">Date de début
+            <div
+              className="ml-2 inline-block cursor-pointer relative"
+              onMouseEnter={() => handleTooltipToggle('start_up_date')}
+              onMouseLeave={handleTooltipHide}
+            >
+              <FaQuestionCircle className="text-gray-500" size={15} />
+              {visibleTooltip === 'start_up_date' && (
+                <div className="absolute z-10 bg-gray-900 text-white text-md rounded-lg shadow-lg p-3 -top-12 left-1/2 transform -translate-x-1/2 w-72 text-center">
+                  {tooltips['start_up_date']}
+                  <div className="absolute left-1/2 transform -translate-x-1/2 w-2.5 h-2.5 bg-gray-900 rotate-45 bottom-[-5px]"></div>
+                </div>
+              )}
+            </div>
+          </Label>
           <Input
             id="start_up_date"
             type="date"
@@ -105,7 +176,21 @@ const ProfessionalInfo = ({ data, onChange, }: { data: any; onChange: (data: any
           />
         </div>
         <div>
-          <Label htmlFor="category">Catégorie</Label>
+          <Label htmlFor="category">Catégorie
+            <div
+              className="ml-2 inline-block cursor-pointer relative"
+              onMouseEnter={() => handleTooltipToggle('category')}
+              onMouseLeave={handleTooltipHide}
+            >
+              <FaQuestionCircle className="text-gray-500" size={15} />
+              {visibleTooltip === 'category' && (
+                <div className="absolute z-10 bg-gray-900 text-white text-md rounded-lg shadow-lg p-3 -top-12 left-1/2 transform -translate-x-1/2 w-72 text-center">
+                  {tooltips['category']}
+                  <div className="absolute left-1/2 transform -translate-x-1/2 w-2.5 h-2.5 bg-gray-900 rotate-45 bottom-[-5px]"></div>
+                </div>
+              )}
+            </div>
+          </Label>
           <Input
             id="category"
             value={data.category}
@@ -114,7 +199,21 @@ const ProfessionalInfo = ({ data, onChange, }: { data: any; onChange: (data: any
           />
         </div>
         <div>
-          <Label htmlFor="title_qualification">Qualification</Label>
+          <Label htmlFor="title_qualification">Qualification
+            <div
+              className="ml-2 inline-block cursor-pointer relative"
+              onMouseEnter={() => handleTooltipToggle('title_qualification')}
+              onMouseLeave={handleTooltipHide}
+            >
+              <FaQuestionCircle className="text-gray-500" size={15} />
+              {visibleTooltip === 'title_qualification' && (
+                <div className="absolute z-10 bg-gray-900 text-white text-md rounded-lg shadow-lg p-3 -top-12 left-1/2 transform -translate-x-1/2 w-72 text-center">
+                  {tooltips['title_qualification']}
+                  <div className="absolute left-1/2 transform -translate-x-1/2 w-2.5 h-2.5 bg-gray-900 rotate-45 bottom-[-5px]"></div>
+                </div>
+              )}
+            </div>
+          </Label>
           <Input
             id="title_qualification"
             value={data.title_qualification}
@@ -123,7 +222,21 @@ const ProfessionalInfo = ({ data, onChange, }: { data: any; onChange: (data: any
           />
         </div>
         <div>
-          <Label htmlFor="work_phone_number">Téléphone professionnel</Label>
+          <Label htmlFor="work_phone_number">Téléphone professionnel
+            <div
+              className="ml-2 inline-block cursor-pointer relative"
+              onMouseEnter={() => handleTooltipToggle('work_phone_number')}
+              onMouseLeave={handleTooltipHide}
+            >
+              <FaQuestionCircle className="text-gray-500" size={15} />
+              {visibleTooltip === 'work_phone_number' && (
+                <div className="absolute z-10 bg-gray-900 text-white text-md rounded-lg shadow-lg p-3 -top-12 left-1/2 transform -translate-x-1/2 w-72 text-center">
+                  {tooltips['work_phone_number']}
+                  <div className="absolute left-1/2 transform -translate-x-1/2 w-2.5 h-2.5 bg-gray-900 rotate-45 bottom-[-5px]"></div>
+                </div>
+              )}
+            </div>
+          </Label>
           <Input
             id="work_phone_number"
             value={data.work_phone_number}
@@ -132,7 +245,21 @@ const ProfessionalInfo = ({ data, onChange, }: { data: any; onChange: (data: any
           />
         </div>
         <div>
-          <Label htmlFor="work_email">Email professionnel</Label>
+          <Label htmlFor="work_email">Email professionnel
+            <div
+              className="ml-2 inline-block cursor-pointer relative"
+              onMouseEnter={() => handleTooltipToggle('work_email')}
+              onMouseLeave={handleTooltipHide}
+            >
+              <FaQuestionCircle className="text-gray-500" size={15} />
+              {visibleTooltip === 'work_email' && (
+                <div className="absolute z-10 bg-gray-900 text-white text-md rounded-lg shadow-lg p-3 -top-12 left-1/2 transform -translate-x-1/2 w-72 text-center">
+                  {tooltips['work_email']}
+                  <div className="absolute left-1/2 transform -translate-x-1/2 w-2.5 h-2.5 bg-gray-900 rotate-45 bottom-[-5px]"></div>
+                </div>
+              )}
+            </div>
+          </Label>
           <Input
             id="work_email"
             value={data.work_email}
@@ -142,7 +269,21 @@ const ProfessionalInfo = ({ data, onChange, }: { data: any; onChange: (data: any
           />
         </div>
         <div>
-          <Label htmlFor="site">Site affecte</Label>
+          <Label htmlFor="site">Site affecte
+            <div
+              className="ml-2 inline-block cursor-pointer relative"
+              onMouseEnter={() => handleTooltipToggle('site')}
+              onMouseLeave={handleTooltipHide}
+            >
+              <FaQuestionCircle className="text-gray-500" size={15} />
+              {visibleTooltip === 'site' && (
+                <div className="absolute z-10 bg-gray-900 text-white text-md rounded-lg shadow-lg p-3 -top-12 left-1/2 transform -translate-x-1/2 w-72 text-center">
+                  {tooltips['site']}
+                  <div className="absolute left-1/2 transform -translate-x-1/2 w-2.5 h-2.5 bg-gray-900 rotate-45 bottom-[-5px]"></div>
+                </div>
+              )}
+            </div>
+          </Label>
 
           <Select onValueChange={handleSiteChange}>
             <SelectTrigger className="">
@@ -161,7 +302,21 @@ const ProfessionalInfo = ({ data, onChange, }: { data: any; onChange: (data: any
           </Select>
         </div>
         <div>
-          <Label htmlFor="post">Poste</Label>
+          <Label htmlFor="post">Poste
+            <div
+              className="ml-2 inline-block cursor-pointer relative"
+              onMouseEnter={() => handleTooltipToggle('post')}
+              onMouseLeave={handleTooltipHide}
+            >
+              <FaQuestionCircle className="text-gray-500" size={15} />
+              {visibleTooltip === 'post' && (
+                <div className="absolute z-10 bg-gray-900 text-white text-md rounded-lg shadow-lg p-3 -top-12 left-1/2 transform -translate-x-1/2 w-72 text-center">
+                  {tooltips['post']}
+                  <div className="absolute left-1/2 transform -translate-x-1/2 w-2.5 h-2.5 bg-gray-900 rotate-45 bottom-[-5px]"></div>
+                </div>
+              )}
+            </div>
+          </Label>
           <MultiSelect
             options={poste.map((post) => ({
               label: post.post_name,
@@ -174,8 +329,8 @@ const ProfessionalInfo = ({ data, onChange, }: { data: any; onChange: (data: any
             defaultValue={data.post}
             placeholder="Sélectionnez des postes"
             variant="inverted"
-            //animation={2}
-            //maxCount={3}
+          //animation={2}
+          //maxCount={3}
           />
         </div>
       </div>

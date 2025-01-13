@@ -70,7 +70,7 @@ const Postes = () => {
   const fetchPost = async () => {
     setLoading(true);
     try {
-      const response = await axios.get("http://localhost:8000/api/posts");
+      const response = await axios.get(`${process.env.NEXT_PUBLIC_API_BASE_URL}/posts`);
       setPostData(response.data);
     } catch (error) {
       console.error("Erreur lors de la récupération des postes :", error);
@@ -84,13 +84,13 @@ const Postes = () => {
       if (checkedItem.length === 1) {
 
         const idToDelete = checkedItem[0];
-        await axios.delete(`http://localhost:8000/api/posts/${idToDelete}/`);
+        await axios.delete(`${process.env.NEXT_PUBLIC_API_BASE_URL}/posts/${idToDelete}/`);
         setPostData(postData.filter((item) => item.id !== idToDelete));
         confirmDelete()
       } else {
 
         const post_ids = checkedItem;
-        await axios.post("http://localhost:8000/api/posts/delete-multiple/", {
+        await axios.post(`${process.env.NEXT_PUBLIC_API_BASE_URL}/posts/delete-multiple/`, {
           post_ids
         });
         setPostData(postData.filter((item) => !checkedItem.includes(item.id)));

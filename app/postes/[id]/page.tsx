@@ -67,7 +67,7 @@ const DetailPost = ({ params }: { params: { id: string } }) => {
     const fetchInfo = async () => {
       setLoading(true);
       try {
-        const response = await axios.get(`http://localhost:8000/api/posts/${id}`);
+        const response = await axios.get(`${process.env.NEXT_PUBLIC_API_BASE_URL}/posts/${id}`);
         setInfo(response.data);
         setFormData({
           post_name: response.data.post_name,
@@ -115,7 +115,7 @@ const DetailPost = ({ params }: { params: { id: string } }) => {
     setUpdating(true);
 
     try {
-      const response = await axios.put(`http://localhost:8000/api/posts/${id}/`, {
+      const response = await axios.put(`${process.env.NEXT_PUBLIC_API_BASE_URL}/posts/${id}/`, {
         id: info?.id,
         post_name: formData.post_name,
         post_description: formData.post_description,
