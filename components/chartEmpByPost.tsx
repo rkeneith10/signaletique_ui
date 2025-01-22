@@ -1,6 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import axios from 'axios';
+import { useSession } from "next-auth/react";
 import { useEffect, useState } from 'react';
 import { Bar, BarChart, CartesianGrid, Tooltip, XAxis } from 'recharts';
 
@@ -16,6 +17,8 @@ interface Post {
 }
 
 const ChartEmpByPost = () => {
+  const { data: session } = useSession();
+  const accessToken = session?.accessToken;
   const [employes, setEmployes] = useState([]);
   const [chartData, setChartData] = useState<ChartData[]>([]);
   const [posts, setPosts] = useState<Post[]>([]);  // Utilisation cohérente de 'posts'
@@ -24,21 +27,21 @@ const ChartEmpByPost = () => {
   function getEmployeeCountByPost(employes: any, posts: Post[]): ChartData[] {
     const colors = [
       "#FF5733", // Couleur 1
-      "#33FF23", // Couleur 2
+      "#334", // Couleur 2
       "#3357FF", // Couleur 3
       "#F3FF33", // Couleur 4
       "#FF33F6", // Couleur 5
       "#33FFF0", // Couleur 6
     ];
-  
+
     const postCountMap: Record<string, number> = {};
-  
+
     employes.forEach((employe: any) => {
       employe.posts.forEach((postId: any) => {
         postCountMap[postId] = (postCountMap[postId] || 0) + 1;
       });
     });
-  
+
     return Object.entries(postCountMap).map(([postId, count], index) => {
       const post = posts.find((p) => p.id === postId);
       return {
@@ -48,13 +51,17 @@ const ChartEmpByPost = () => {
       };
     });
   }
-  
+
 
   // Effect pour récupérer les données des employés et des postes
   useEffect(() => {
     const fetchPosts = async () => {
       try {
-        const response = await axios.get(`${process.env.NEXT_PUBLIC_API_BASE_URL}/posts/`);
+        const response = await axios.get(`${process.env.NEXT_PUBLIC_API_BASE_URL}/posts/`, {
+          headers: {
+            Authorization: `Bearer ${accessToken}`
+          }
+        });
         setPosts(response.data);  // Supposons que chaque élément contient { id, post_name }
       } catch (error) {
         console.error('Erreur lors de la récupération des postes:', error);
@@ -64,13 +71,18 @@ const ChartEmpByPost = () => {
 
     const fetchEmployees = async () => {
       try {
-        const response = await axios.get(`${process.env.NEXT_PUBLIC_API_BASE_URL}/employees/`);
+        const response = await axios.get(`${process.env.NEXT_PUBLIC_API_BASE_URL}/employees/`, {
+          headers: {
+            Authorization: `Bearer ${accessToken}`
+          }
+        });
         setEmployes(response.data);
       } catch (error) {
         console.log(error);
       }
     };
     fetchEmployees();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   // Mettre à jour chartData lorsque employes et posts sont disponibles
@@ -96,12 +108,12 @@ const ChartEmpByPost = () => {
         </BarChart>
       </CardContent>
       <CardFooter className="flex-col items-start gap-2 text-sm">
-        <div className="flex gap-2 font-medium leading-none">
+        {/* <div className="flex gap-2 font-medium leading-none">
           Nombre d&#39; employés par poste
-        </div>
-        <div className="leading-none text-muted-foreground">
+        </div> */}
+        {/* <div className="leading-none text-muted-foreground">
           Statistiques actuelles des employés dans l entreprise
-        </div>
+        </div> */}
       </CardFooter>
     </Card>
   );

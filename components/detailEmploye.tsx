@@ -8,6 +8,7 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import axios from "axios";
+import { useSession } from "next-auth/react";
 import React, { useEffect, useState } from 'react';
 import { Avatar, AvatarImage } from "./ui/avatar";
 interface Site {
@@ -66,6 +67,8 @@ interface AdresseEmp {
 }
 
 const DetailEmploye: React.FC<DetailEmploye> = ({ isOpen, onClose, employe }) => {
+  const { data: session } = useSession();
+  const accessToken = session?.accessToken;
   const [siteinfo, setSiteInfo] = useState<Site[]>([]);
   const [postInfo, setPostInfo] = useState<Post[]>([]);
   const [adresseInfo, setAdresseInfo] = useState<AdresseEmp | null>(null);
@@ -93,7 +96,11 @@ const DetailEmploye: React.FC<DetailEmploye> = ({ isOpen, onClose, employe }) =>
 
   const fetchSite = async () => {
     try {
-      const response = await axios.get("http://localhost:8000/api/sites/");
+      const response = await axios.get(`${process.env.NEXT_PUBLIC_API_BASE_URL}/sites/`, {
+        headers: {
+          Authorization: `Bearer ${accessToken}`
+        }
+      });
       setSiteInfo(response.data);
       console.log("Site")
       console.log(siteinfo)
@@ -104,7 +111,11 @@ const DetailEmploye: React.FC<DetailEmploye> = ({ isOpen, onClose, employe }) =>
 
   const fetchPost = async () => {
     try {
-      const response = await axios.get("http://localhost:8000/api/posts/");
+      const response = await axios.get(`${process.env.NEXT_PUBLIC_API_BASE_URL}/posts/`, {
+        headers: {
+          Authorization: `Bearer ${accessToken}`
+        }
+      });
       setPostInfo(response.data);
       console.log("Poste")
       console.log(postInfo)

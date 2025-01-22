@@ -13,6 +13,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import axios from "axios";
+import { useSession } from "next-auth/react";
 //import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import { FaFilePdf, FaImage, FaUserCircle } from "react-icons/fa";
@@ -28,6 +29,8 @@ pdfjs.GlobalWorkerOptions.workerSrc = new URL(
 
 const AddFileEmploye = ({ params }: { params: { id: string } }) => {
   const { id } = params;
+  const {data:session} = useSession();
+  const accessToken = session?.accessToken;
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [fileData, setFileData] = useState<any[]>([]);
@@ -50,7 +53,11 @@ const AddFileEmploye = ({ params }: { params: { id: string } }) => {
 
   const fetchFile = async () => {
     try {
-      const response = await axios.get(`${process.env.NEXT_PUBLIC_API_BASE_URL}/files/by-employee/${id}`);
+      const response = await axios.get(`${process.env.NEXT_PUBLIC_API_BASE_URL}/files/by-employee/${id}`,{
+        headers:{
+          Authorization:`Bearer ${accessToken}`
+        }
+      });
       setFileData(response.data);
     } catch (error) {
       console.log(error);
@@ -59,7 +66,11 @@ const AddFileEmploye = ({ params }: { params: { id: string } }) => {
 
   const fetchEmploye = async () => {
     try {
-      const response = await axios.get(`${process.env.NEXT_PUBLIC_API_BASE_URL}/employees/${id}`);
+      const response = await axios.get(`${process.env.NEXT_PUBLIC_API_BASE_URL}/employees/${id}`,{
+        headers:{
+          Authorization:`Bearer ${accessToken}`
+        }
+      });
       setInfoEmp(response.data);
       if (response.data.photo) {
         setSelectedImage(response.data.photo); // Mettre à jour l'image
@@ -98,7 +109,12 @@ const AddFileEmploye = ({ params }: { params: { id: string } }) => {
       try {
         const response = await axios.post(
           `${process.env.NEXT_PUBLIC_API_BASE_URL}/employees/${id}/upload-photo/`,
-          formData
+          formData,{
+            headers:{
+              Authorization:`Bearer ${accessToken}`,
+              'Content-Type': 'multipart/form-data', 
+            }
+          }
         );
         toast.success("Photo de profil mise à jour");
         const uploadedImageUrl = response.data.photo_url;

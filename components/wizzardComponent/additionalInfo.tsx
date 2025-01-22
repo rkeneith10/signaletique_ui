@@ -43,7 +43,7 @@ const AdditionalInfo = ({
 
         const nom_application = "Signaletique";
 
-        const response = await axios.get(`http://localhost:3001/api/tooltipCtrl?nom_application=${encodeURIComponent(nom_application)}`);
+        const response = await axios.get(`http://isteah-tech.ddns.net:9097/api/tooltipCtrl?nom_application=${encodeURIComponent(nom_application)}`);
 
         const tooltipMap: Record<string, string> = {};
         const tooltips = response.data.tooltip;

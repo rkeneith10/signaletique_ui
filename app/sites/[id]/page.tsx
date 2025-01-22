@@ -10,6 +10,7 @@ import { Loader2 } from 'lucide-react';
 import {useRouter} from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { FaQuestionCircle } from 'react-icons/fa';
+import { useSession } from 'next-auth/react';
 
 
 interface Site {
@@ -25,6 +26,7 @@ interface TooltipAttributes {
 }
 const DetailSite = ({ params }: { params: { id: string } }) => {
   const { id } = params;
+  const { data: session } = useSession(); 
   const router = useRouter();
   const [loading, setLoading] = useState<boolean>(true);
   const [visibleTooltip, setVisibleTooltip] = useState<string | null>(null);
@@ -67,7 +69,12 @@ const DetailSite = ({ params }: { params: { id: string } }) => {
     const fetchInfo = async () => {
       setLoading(true);
       try {
-        const response = await axios.get(`${process.env.NEXT_PUBLIC_API_BASE_URL}/sites/${id}`);
+        const accessToken = session?.accessToken as string;
+        const response = await axios.get(`${process.env.NEXT_PUBLIC_API_BASE_URL}/sites/${id}`,{
+          headers: {
+            Authorization: `Bearer ${accessToken}`,  // Utiliser le token d'accès
+          },
+        });
         setInfo(response.data);
         setFormData({
           site_name: response.data.site_name,
@@ -108,6 +115,7 @@ const DetailSite = ({ params }: { params: { id: string } }) => {
     fetchInfo();
     fetchTooltips();
 
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [id]);
 
   const handleUpdateInfo = async (e: React.FormEvent<HTMLFormElement>) => {
@@ -115,10 +123,15 @@ const DetailSite = ({ params }: { params: { id: string } }) => {
     setUpdating(true);
 
     try {
+      const accessToken = session?.accessToken as string;
       const response = await axios.put(`${process.env.NEXT_PUBLIC_API_BASE_URL}/sites/${id}/`, {
         id: info?.id,
         site_name: formData.site_name,
         adresse: formData.adresse,
+      },{
+        headers: {
+          Authorization: `Bearer ${accessToken}`,  // Utiliser le token d'accès
+        },
       });
 
       if (response.status !== 200) {

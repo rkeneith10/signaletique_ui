@@ -17,6 +17,7 @@ import { Loader2 } from "lucide-react";
 import React, { useState } from 'react';
 import { FaPlus } from 'react-icons/fa';
 import { Button } from './ui/button';
+import { useSession } from "next-auth/react";
 
 interface FileModalProps {
   employeeId: string;
@@ -28,6 +29,8 @@ interface FileModalProps {
 
 
 const FormModalDossierEmp: React.FC<FileModalProps> = ({ onSuccess, onFailed, onFailedType, employeeId, }) => {
+  const {data:session} = useSession();
+  const accessToken = session?.accessToken;
   const [adding, setAdding] = useState(false);
   const [file, setFile] = useState<File | null>(null);
   const [fileType, setFileType] = useState<string | null>(null);
@@ -57,8 +60,9 @@ const FormModalDossierEmp: React.FC<FileModalProps> = ({ onSuccess, onFailed, on
 
     try {
 
-      const response = await axios.post("http://localhost:8000/api/files/", formData, {
+      const response = await axios.post(`${process.env.NEXT_PUBLIC_API_BASE_URL}/files/`, formData, {
         headers: {
+          Authorization:`Bearer ${accessToken}`,
           "Content-Type": "multipart/form-data",
         },
       });

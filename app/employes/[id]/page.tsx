@@ -5,6 +5,7 @@ import Layout from '@/components/rootLayout';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+
 import {
   Select,
   SelectContent,
@@ -18,6 +19,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Textarea } from '@/components/ui/textarea';
 import axios from 'axios';
 import { Loader2 } from 'lucide-react';
+import { useSession } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 import React, { useEffect, useState } from 'react';
 import { toast } from 'sonner';
@@ -36,6 +38,7 @@ interface FormDataType {
     numero_rue: string;
     libelle_adresse: string;
     villeRecord: string;
+    section_communale: string;
     from: string;
   };
   professionalInfo: {
@@ -75,6 +78,8 @@ interface Option {
 }
 const InfoEmploye = ({ params }: { params: { id: string } }) => {
   const { id } = params;
+  const { data: session } = useSession();
+  const accessToken = session?.accessToken;
   const router = useRouter();
   const [loading, setLoading] = useState<boolean>(true);
   //const [visibleTooltip, setVisibleTooltip] = useState<string | null>(null);
@@ -106,6 +111,7 @@ const InfoEmploye = ({ params }: { params: { id: string } }) => {
       numero_rue: "",
       libelle_adresse: "",
       villeRecord: "",
+      section_communale: "",
       from: "",
     },
     professionalInfo: {
@@ -140,10 +146,15 @@ const InfoEmploye = ({ params }: { params: { id: string } }) => {
     const fetchEmployeeInfo = async () => {
       setLoading(true);
       try {
-        const response = await axios.get(`${process.env.NEXT_PUBLIC_API_BASE_URL}/employees/${id}/`);
+
+        const response = await axios.get(`${process.env.NEXT_PUBLIC_API_BASE_URL}/employees/${id}/`, {
+          headers: {
+            Authorization: `Bearer ${accessToken}`
+          }
+        });
         setInfo(response.data);
 
-        const response2 = await axios.get(`http://localhost:3001/api/adresseCtrl/${response.data.id_adress}`);
+        const response2 = await axios.get(`http://isteah-tech.ddns.net:9097/api/adresseCtrl/${response.data.id_adress}`);
 
 
         setFormData({
@@ -196,8 +207,13 @@ const InfoEmploye = ({ params }: { params: { id: string } }) => {
 
     const fetchSite = async () => {
       try {
-        const response = await axios.get(`${process.env.NEXT_PUBLIC_API_BASE_URL}/sites/`);
-        console.log(response)
+
+        const response = await axios.get(`${process.env.NEXT_PUBLIC_API_BASE_URL}/sites/`, {
+          headers: {
+            Authorization: `Bearer ${accessToken}`
+          }
+        });
+
         setSite(response.data);
       } catch (error) {
         console.error("Error fetching sites:", error);
@@ -207,7 +223,11 @@ const InfoEmploye = ({ params }: { params: { id: string } }) => {
 
     const fetchPost = async () => {
       try {
-        const response = await axios.get(`${process.env.NEXT_PUBLIC_API_BASE_URL}/posts/`);
+        const response = await axios.get(`${process.env.NEXT_PUBLIC_API_BASE_URL}/posts/`, {
+          headers: {
+            Authorization: `Bearer ${accessToken}`
+          }
+        });
         const data = response.data;
 
 
@@ -217,8 +237,12 @@ const InfoEmploye = ({ params }: { params: { id: string } }) => {
         }));
 
         setPosts(options);
-        const responseEmp = await axios.get(`${process.env.NEXT_PUBLIC_API_BASE_URL}/employees/${id}/`);
-        console.log(responseEmp.data.posts)
+        const responseEmp = await axios.get(`${process.env.NEXT_PUBLIC_API_BASE_URL}/employees/${id}/`, {
+          headers: {
+            Authorization: `Bearer ${accessToken}`
+          }
+        });
+
         const selectPost: Option[] = [];
         responseEmp.data?.posts?.forEach((p: string) => {
           console.log(p)
@@ -271,15 +295,21 @@ const InfoEmploye = ({ params }: { params: { id: string } }) => {
         salary_scale: formData.additionalInfo.salary_scale,
         remarques: formData.additionalInfo.remarques,
 
+      }, {
+        headers: {
+          Authorization: `Bearer ${accessToken}`
+        }
       });
 
-      const response2 = await axios.post(`http://localhost:3001/api/adresseCtrl/updateadresse`, {
+      const response2 = await axios.post(`http://isteah-tech.ddns.net:9097/api/adresseCtrl/updateadresse`, {
         id_adresses: info?.id_adress,
         libelle_adresse: formData.personalInfo.libelle_adresse,
         numero_rue: formData.personalInfo.numero_rue,
-        villeRecord: formData.personalInfo.villeRecord
+        villeRecord: formData.personalInfo.villeRecord,
+        section_communale: formData.personalInfo.section_communale
 
-      })
+      }, { headers: { "Content-Type": "application/json" } }
+      )
 
 
 
@@ -314,7 +344,7 @@ const InfoEmploye = ({ params }: { params: { id: string } }) => {
       // Gérer l'erreur de mise à jour
       setUpdating(false);
       toast.error("Erreur lors de la modification des informations");
- 
+
 
       console.error("Update error:", error);
     } finally {

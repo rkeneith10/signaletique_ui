@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 "use client";
 import confirmUpdate from '@/components/confirmUpdate';
 import Layout from '@/components/rootLayout';
@@ -11,6 +12,7 @@ import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { FaQuestionCircle } from 'react-icons/fa';
 import { toast } from 'sonner';
+import { useSession } from 'next-auth/react';
 
 
 
@@ -27,6 +29,7 @@ interface TooltipAttributes {
 }
 const DetailPost = ({ params }: { params: { id: string } }) => {
   const { id } = params;
+  const { data: session } = useSession();
   const router = useRouter();
   const [loading, setLoading] = useState<boolean>(true);
   const [visibleTooltip, setVisibleTooltip] = useState<string | null>(null);
@@ -67,7 +70,12 @@ const DetailPost = ({ params }: { params: { id: string } }) => {
     const fetchInfo = async () => {
       setLoading(true);
       try {
-        const response = await axios.get(`${process.env.NEXT_PUBLIC_API_BASE_URL}/posts/${id}`);
+        const accessToken = session?.accessToken;
+        const response = await axios.get(`${process.env.NEXT_PUBLIC_API_BASE_URL}/posts/${id}`,{
+          headers: {
+            Authorization: `Bearer ${accessToken}`,  
+          },
+        });
         setInfo(response.data);
         setFormData({
           post_name: response.data.post_name,
@@ -115,10 +123,15 @@ const DetailPost = ({ params }: { params: { id: string } }) => {
     setUpdating(true);
 
     try {
+      const accessToken = session?.accessToken;
       const response = await axios.put(`${process.env.NEXT_PUBLIC_API_BASE_URL}/posts/${id}/`, {
         id: info?.id,
         post_name: formData.post_name,
         post_description: formData.post_description,
+      },{
+        headers: {
+          Authorization: `Bearer ${accessToken}`,  // Utiliser le token d'accès
+        },
       });
 
       if (response.status !== 200) {

@@ -4,7 +4,7 @@ import Layout from '@/components/rootLayout';
 import SearchInput from '@/components/searchInput';
 import { Button } from '@/components/ui/button';
 import { Checkbox } from "@/components/ui/checkbox";
-
+import { useSession } from 'next-auth/react';
 import FormModalEmploye from '@/components/formModalEmploye';
 import SkeletonTable from '@/components/skeletonTable';
 import {
@@ -81,6 +81,7 @@ interface Post {
 }
 
 const Employes = () => {
+  const {data:session}=useSession();
   const [searchTerm, setSearchTerm] = useState("");
   const [empData, setEmpData] = useState<Employe[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
@@ -102,7 +103,7 @@ const Employes = () => {
     const firstNameMatch = emp.first_name?.toLowerCase().includes(searchTerm.toLowerCase());
     const lastNameMatch = emp.last_name?.toLowerCase().includes(searchTerm.toLowerCase());
 
-    return firstNameMatch || lastNameMatch; // Retourne true si l'un des deux correspond
+    return firstNameMatch || lastNameMatch; 
   });
 
 
@@ -133,7 +134,12 @@ const Employes = () => {
   const fetchEmploye = async () => {
     setLoading(true);
     try {
-      const response = await axios.get(`${process.env.NEXT_PUBLIC_API_BASE_URL}/employees`);
+      const accessToken = session?.accessToken;
+      const response = await axios.get(`${process.env.NEXT_PUBLIC_API_BASE_URL}/employees`,{
+        headers: {
+          Authorization: `Bearer ${accessToken}`,  
+        },
+      });
       setEmpData(response.data);
     } catch (error) {
       console.error("Erreur lors de la récupération  :", error);
@@ -144,10 +150,15 @@ const Employes = () => {
 
   const handleDelete = async () => {
     try {
+      const accessToken = session?.accessToken;
       if (checkedItem) {
 
         const idToDelete = checkedItem;
-        await axios.delete(`${process.env.NEXT_PUBLIC_API_BASE_URL}/employees/${idToDelete}/`);
+        await axios.delete(`${process.env.NEXT_PUBLIC_API_BASE_URL}/employees/${idToDelete}/`,{
+          headers: {
+            Authorization: `Bearer ${accessToken}`,  
+          },
+        });
         confirmDelete()
         setEmpData(empData.filter((item) => item.id !== idToDelete));
       }
@@ -160,7 +171,12 @@ const Employes = () => {
 
   const fetchSite = async () => {
     try {
-      const response = await axios.get(`${process.env.NEXT_PUBLIC_API_BASE_URL}/sites/`);
+      const accessToken = session?.accessToken;
+      const response = await axios.get(`${process.env.NEXT_PUBLIC_API_BASE_URL}/sites/`,{
+        headers:{
+          Authorization:`Bearer ${accessToken}`
+        }
+      });
       setSiteInfo(response.data);
     } catch (error) {
       console.error("Erreur lors de la récupération  :", error);
@@ -169,7 +185,12 @@ const Employes = () => {
 
   const fetchPost = async () => {
     try {
-      const response = await axios.get(`${process.env.NEXT_PUBLIC_API_BASE_URL}/posts/`);
+      const accessToken = session?.accessToken;
+      const response = await axios.get(`${process.env.NEXT_PUBLIC_API_BASE_URL}/posts/`,{
+        headers:{
+          Authorization: `Bearer ${accessToken}`
+        }
+      });
       setPostInfo(response.data);
     } catch (error) {
       console.error("Erreur lors de la récupération  :", error);

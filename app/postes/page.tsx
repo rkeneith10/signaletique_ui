@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 "use client";
 import FormModalPoste from '@/components/formModalPoste';
 import Layout from '@/components/rootLayout';
@@ -20,6 +21,7 @@ import {
 import { Pagination, PaginationContent, PaginationEllipsis, PaginationItem, PaginationLink, PaginationNext, PaginationPrevious } from "@/components/ui/pagination";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import axios from "axios";
+import { useSession } from 'next-auth/react';
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
 import { FaEdit, FaTrash } from 'react-icons/fa';
@@ -60,6 +62,7 @@ const Postes = () => {
     toast.success("Le poste a été enregistré avec succès");
 
   };
+  const { data: session } = useSession();
   const handleFailed = () => {
     toast.error("Une erreur est survenue lors de l'ajout");
   };
@@ -67,10 +70,16 @@ const Postes = () => {
     document.title = "Postes"
     fetchPost();
   }, [])
+
   const fetchPost = async () => {
     setLoading(true);
     try {
-      const response = await axios.get(`${process.env.NEXT_PUBLIC_API_BASE_URL}/posts`);
+      const accessToken = session?.accessToken;
+      const response = await axios.get(`${process.env.NEXT_PUBLIC_API_BASE_URL}/posts`, {
+        headers: {
+          Authorization: `Bearer ${accessToken}`,  // Utiliser le token d'accès
+        },
+      });
       setPostData(response.data);
     } catch (error) {
       console.error("Erreur lors de la récupération des postes :", error);
@@ -81,10 +90,15 @@ const Postes = () => {
 
   const handleDelete = async () => {
     try {
+      const accessToken = session?.accessToken;
       if (checkedItem.length === 1) {
 
         const idToDelete = checkedItem[0];
-        await axios.delete(`${process.env.NEXT_PUBLIC_API_BASE_URL}/posts/${idToDelete}/`);
+        await axios.delete(`${process.env.NEXT_PUBLIC_API_BASE_URL}/posts/${idToDelete}/`,{
+          headers: {
+            Authorization: `Bearer ${accessToken}`,  // Utiliser le token d'accès
+          },
+        });
         setPostData(postData.filter((item) => item.id !== idToDelete));
         confirmDelete()
       } else {
@@ -92,6 +106,10 @@ const Postes = () => {
         const post_ids = checkedItem;
         await axios.post(`${process.env.NEXT_PUBLIC_API_BASE_URL}/posts/delete-multiple/`, {
           post_ids
+        },{
+          headers: {
+            Authorization: `Bearer ${accessToken}`,  // Utiliser le token d'accès
+          },
         });
         setPostData(postData.filter((item) => !checkedItem.includes(item.id)));
         confirmDelete()

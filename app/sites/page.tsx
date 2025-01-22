@@ -24,6 +24,7 @@ import Link from 'next/link';
 import { useEffect, useState } from 'react';
 import { FaEdit, FaTrash } from 'react-icons/fa';
 import { toast } from 'sonner';
+import { useSession } from 'next-auth/react';
 
 interface Site {
   id: number;
@@ -62,7 +63,6 @@ const Sites = () => {
   };
   const handleSuccess = () => {
     fetchPost();
-    setShowModal(true)
     toast.success("Le site a été enregistré avec succès");
 
   };
@@ -73,25 +73,41 @@ const Sites = () => {
   useEffect(() => {
     document.title = "Sites"
     fetchPost();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
+
+  const { data: session } = useSession(); 
   const fetchPost = async () => {
+    
     setLoading(true);
+    
     try {
-      const response = await axios.get(`${process.env.NEXT_PUBLIC_API_BASE_URL}/sites`);
+      const accessToken = session?.accessToken as string;
+      const response = await axios.get(`${process.env.NEXT_PUBLIC_API_BASE_URL}/sites`, {
+        headers: {
+          Authorization: `Bearer ${accessToken}`,  // Utiliser le token d'accès
+        },
+      });
       setSiteData(response.data);
     } catch (error) {
       console.error("Erreur lors de la récupération des sites :", error);
     } finally {
       setLoading(false);
     }
-  }
+  };
+  
 
   const handleDelete = async () => {
     try {
+      const accessToken = session?.accessToken as string;
       if (checkedItem.length === 1) {
 
         const idToDelete = checkedItem[0];
-        await axios.delete(`${process.env.NEXT_PUBLIC_API_BASE_URL}/sites/${idToDelete}/`);
+        await axios.delete(`${process.env.NEXT_PUBLIC_API_BASE_URL}/sites/${idToDelete}/`, {
+        headers: {
+          Authorization: `Bearer ${accessToken}`,  
+        },
+      });
         setSiteData(siteData.filter((item) => item.id !== idToDelete));
       } else {
 
@@ -99,7 +115,12 @@ const Sites = () => {
 
         await axios.post(`${process.env.NEXT_PUBLIC_API_BASE_URL}/sites/delete-multiple/`, {
           site_ids
-        });
+        },{
+          headers: {
+            Authorization: `Bearer ${accessToken}`,  
+          },
+        }
+      );
         setSiteData(siteData.filter((item) => !checkedItem.includes(item.id)));
       }
       setCheckedItem([]);

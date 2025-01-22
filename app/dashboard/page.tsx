@@ -3,6 +3,7 @@ import ChartEmpByPost from '@/components/chartEmpByPost';
 import Layout from '@/components/rootLayout';
 import { Button } from '@/components/ui/button';
 import axios from 'axios';
+import { useSession } from 'next-auth/react';
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
 import { FaClipboardList, FaUsers } from 'react-icons/fa';
@@ -10,6 +11,8 @@ import { MdHomeWork } from 'react-icons/md';
 
 
 const Dashboard = () => {
+  const {data:session}= useSession();
+  const accessToken = session?.accessToken;
   const [sites, setSites] = useState([]);
   const [postes, setPostes] = useState([]);
   const [employes, setEmployes] = useState([]);
@@ -17,11 +20,24 @@ const Dashboard = () => {
 
   useEffect(() => {
     document.title = "Tableau de bord";
+    console.log(accessToken)
     const fetchData = async () => {
       try {
-        const responseSite = await axios.get(`${process.env.NEXT_PUBLIC_API_BASE_URL}/sites/`);
-        const responsePost = await axios.get(`${process.env.NEXT_PUBLIC_API_BASE_URL}/posts/`);
-        const responseEmployes = await axios.get(`${process.env.NEXT_PUBLIC_API_BASE_URL}/employees/`);
+        const responseSite = await axios.get(`${process.env.NEXT_PUBLIC_API_BASE_URL}/sites/`,{
+          headers:{
+            Authorization:`Bearer ${accessToken}`
+          }
+        });
+        const responsePost = await axios.get(`${process.env.NEXT_PUBLIC_API_BASE_URL}/posts/`,{
+          headers:{
+            Authorization:`Bearer ${accessToken}`
+          }
+        });
+        const responseEmployes = await axios.get(`${process.env.NEXT_PUBLIC_API_BASE_URL}/employees/`,{
+          headers:{
+            Authorization:`Bearer ${accessToken}`
+          }
+        });
 
         setSites(responseSite.data);
         setPostes(responsePost.data)
@@ -34,6 +50,7 @@ const Dashboard = () => {
     }
 
     fetchData();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
   return (

@@ -9,6 +9,7 @@ import { useEffect, useState } from 'react';
 import { FaPlus, FaQuestionCircle } from 'react-icons/fa';
 import { Button } from './ui/button';
 import { Textarea } from './ui/textarea';
+import { useSession } from "next-auth/react";
 
 interface TooltipAttributes {
   id_tooltip: number;
@@ -25,6 +26,8 @@ interface PostModalProps {
 }
 
 const FormModalPoste: React.FC<PostModalProps> = ({ onSuccess, onFailed }) => {
+  const {data:session}=useSession()
+  const accessToken = session?.accessToken;
   const [visibleTooltip, setVisibleTooltip] = useState<string | null>(null);
   const [tooltips, setTooltips] = useState<Record<string, string>>({});
   const [adding, setAdding] = useState(false);
@@ -79,8 +82,8 @@ const FormModalPoste: React.FC<PostModalProps> = ({ onSuccess, onFailed }) => {
     setAdding(true);
 
     try {
-      const response = await axios.post("http://localhost:8000/api/posts/", poste, {
-        headers: { "Content-Type": "application/json" },
+      const response = await axios.post(`${process.env.NEXT_PUBLIC_API_BASE_URL}/posts/`, poste, {
+        headers: { Authorization:`Bearer ${accessToken}`,"Content-Type": "application/json" },
       });
       if (response.status === 201) {
         setPoste({

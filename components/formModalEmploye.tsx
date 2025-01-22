@@ -1,21 +1,22 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import {
-  AlertDialog,
+// import {
+//   AlertDialog,
 
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-} from "@/components/ui/alert-dialog";
+//   AlertDialogCancel,
+//   AlertDialogContent,
+//   AlertDialogDescription,
+//   AlertDialogFooter,
+//   AlertDialogHeader,
+//   AlertDialogTitle,
+// } from "@/components/ui/alert-dialog";
 import {
   Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger,
 } from "@/components/ui/dialog";
 
 //import { Loader2 } from "lucide-react";
 import axios from "axios";
-import { useRef, useState } from 'react';
+import { useSession } from "next-auth/react";
+import { useState } from 'react';
 import { FaPlus } from 'react-icons/fa';
 import { toast } from "sonner";
 import confirmAdd from "./confirmAdd";
@@ -25,12 +26,7 @@ import FinancialInfo from "./wizzardComponent/financialInfo";
 import PersonalInfo from "./wizzardComponent/personalInfo";
 import ProfessionalInfo from "./wizzardComponent/professionalInfo";
 
-// interface TooltipAttributes {
-//   id_tooltip: number;
-//   nom_application: string;
-//   nom_champ: string;
-//   message_tooltip: string;
-// }
+
 
 interface FormModalEmployeProps {
   onSave: () => void;
@@ -74,12 +70,7 @@ interface FormDataType {
   };
 };
 
-// interface EmpModalProps {
 
-//   onSuccess: () => void;
-//   onFailed: () => void;
-
-// }
 interface AdresseAttributes {
   id_adresses: number;
   numero_rue: string;
@@ -94,16 +85,17 @@ interface AdresseAttributes {
 }
 
 const FormModalEmploye: React.FC<FormModalEmployeProps> = ({ onSave }) => {
-  // const [visibleTooltip, setVisibleTooltip] = useState<string | null>(null);
-  // const [tooltips, setTooltips] = useState<Record<string, string>>({});
-  //const [adding, setAdding] = useState(false);
+
   const [currentStep, setCurrentStep] = useState(1);
+  const { data: session } = useSession();
+  const accessToken = session?.accessToken;
+
   const [open, setOpen] = useState(false)
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [adresse, setAdresse] = useState<AdresseAttributes[]>([]);
-  const [isAlertDialogOpen, setAlertDialogOpen] = useState(false);
-  const [alertMessage, setAlertMessage] = useState('');
-  const cancelRef = useRef(null);
+  // const [isAlertDialogOpen, setAlertDialogOpen] = useState(false);
+
+  // const cancelRef = useRef(null);
   const [formData, setFormData] = useState<FormDataType>({
     personalInfo: {
       first_name: "",
@@ -192,7 +184,7 @@ const FormModalEmploye: React.FC<FormModalEmployeProps> = ({ onSave }) => {
 
     // Enregistrer l'adresse
     const adresseResponse = await axios.post(
-      "http://localhost:3001/api/adresseCtrl",
+      "http://isteah-tech.ddns.net:9097/api/adresseCtrl",
       { numero_rue, libelle_adresse, statut: "En creation", villeRecord, section_communale, from },
       { headers: { "Content-Type": "application/json" } }
     );
@@ -218,9 +210,9 @@ const FormModalEmploye: React.FC<FormModalEmployeProps> = ({ onSave }) => {
         try {
 
           const employeeResponse = await axios.post(
-            "http://localhost:8000/api/employees/",
+            `${process.env.NEXT_PUBLIC_API_BASE_URL}/employees/`,
             fullEmployeData,
-            { headers: { "Content-Type": "application/json" } }
+            { headers: { Authorization: `Bearer ${accessToken}`, "Content-Type": "application/json" } }
           );
 
           if (employeeResponse.status === 201) {
@@ -235,10 +227,10 @@ const FormModalEmploye: React.FC<FormModalEmployeProps> = ({ onSave }) => {
         } catch (employeeError) {
 
           console.error("Erreur lors de l'enregistrement de l'employé :", employeeError);
-          await axios.delete(`http://localhost:3001/api/adresseCtrl/${id}`);
+          await axios.delete(`http://isteah-tech.ddns.net:9097/api/adresseCtrl/${id}`);
 
-          setAlertMessage("Une erreur est survenue. L'adresse a été supprimée.");
-          setAlertDialogOpen(true);
+          toast.error("Une erreur est survenue. L'adresse a été supprimée.");
+
         }
       }
     }
@@ -285,101 +277,6 @@ const FormModalEmploye: React.FC<FormModalEmployeProps> = ({ onSave }) => {
 
   const isLastStep = currentStep === steps.length;
 
-
-  // const handleTooltipToggle = (field: string) => {
-  //   setVisibleTooltip(field);
-  // };
-
-  // const handleTooltipHide = () => {
-  //   setVisibleTooltip(null);
-  // };
-
-  // const [poste, setPoste] = useState({
-  //   post_name: "",
-  //   post_description: ""
-
-  // });
-
-  // const [errors, setErrors] = useState({
-  //   post_name: "",
-  //   post_description: ""
-  // });
-
-  // const handleinputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-  //   const { name, value } = e.target;
-  //   setPoste({ ...poste, [name]: value });
-  //   setErrors({ ...errors, [name]: "" });
-
-  // };
-
-
-
-  // const validateForm = () => {
-  //   let valid = true;
-  //   const newErrors = { post_name: "", post_description: "" };
-  //   if (!poste.post_name) {
-  //     newErrors.post_name = "Le nom du poste est requis";
-  //     valid = false;
-  //   }
-  //   if (!poste.post_description) {
-  //     newErrors.post_description = "La description est requise";
-  //     valid = false;
-  //   }
-  //   setErrors(newErrors);
-  //   return valid;
-  // };
-
-  // const addPost = async () => {
-  //   if (!validateForm()) {
-  //     return;
-  //   }
-  //   setAdding(true);
-
-  //   try {
-  //     const response = await axios.post("http://localhost:8000/api/posts/", poste, {
-  //       headers: { "Content-Type": "application/json" },
-  //     });
-  //     if (response.status === 201) {
-  //       setPoste({
-  //         post_name: "",
-  //         post_description: "",
-  //       });
-
-  //       onSuccess();
-  //     }
-  //   } catch (error) {
-  //     onFailed();
-  //     console.error("Échec de l'ajout de la section communale", error);
-  //   } finally {
-  //     setAdding(false);
-  //   }
-
-  // }
-
-
-  // useEffect(() => {
-  //   const fetchTooltips = async () => {
-  //     try {
-
-  //       const nom_application = "Signaletique";
-
-  //       const response = await axios.get(`/api/tooltipCtrl?nom_application=${encodeURIComponent(nom_application)}`);
-
-  //       const tooltipMap: Record<string, string> = {};
-  //       const tooltips = response.data.tooltip;
-
-  //       tooltips.forEach((tooltip: TooltipAttributes) => {
-  //         tooltipMap[tooltip.nom_champ] = tooltip.message_tooltip;
-  //       });
-
-  //       setTooltips(tooltipMap);
-  //     } catch (error) {
-  //       console.error('Erreur lors de la récupération des tooltips:', error);
-  //     }
-  //   };
-
-  //   fetchTooltips();
-  // }, []);
   return (
     <div>
       <Dialog open={open} onOpenChange={setOpen}>
@@ -416,7 +313,7 @@ const FormModalEmploye: React.FC<FormModalEmployeProps> = ({ onSave }) => {
         </DialogContent>
       </Dialog>
 
-
+      {/* 
       <AlertDialog open={isAlertDialogOpen}>
         <AlertDialogContent>
           <AlertDialogHeader>
@@ -427,10 +324,10 @@ const FormModalEmploye: React.FC<FormModalEmployeProps> = ({ onSave }) => {
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel ref={cancelRef} onClick={() => setAlertDialogOpen(false)}>Cancel</AlertDialogCancel>
-            {/* <AlertDialogAction>Continue</AlertDialogAction> */}
+         
           </AlertDialogFooter>
         </AlertDialogContent>
-      </AlertDialog>
+      </AlertDialog> */}
 
     </div>
   )

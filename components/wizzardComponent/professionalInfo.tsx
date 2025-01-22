@@ -15,6 +15,7 @@ import axios from "axios";
 import { useEffect, useState } from "react";
 import { FaQuestionCircle } from "react-icons/fa";
 import { MultiSelect } from "../multiSelect";
+import { useSession } from "next-auth/react";
 
 interface TooltipAttributes {
   id_tooltip: number;
@@ -37,6 +38,8 @@ const ProfessionalInfo = ({ data, onChange, }: { data: any; onChange: (data: any
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [selectedSite, setSelectedSite] = useState<string>("");
   const [dateValue, setDateValue] = useState<string>(data.start_up_date || "");
+  const {data:session} = useSession();
+  const accessToken = session?.accessToken
 
   const today = new Date();
   const maxDate = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, "0")}-${String(today.getDate()).padStart(2, "0")}`;
@@ -71,7 +74,11 @@ const ProfessionalInfo = ({ data, onChange, }: { data: any; onChange: (data: any
 
     const fectchSite = async () => {
       try {
-        const response = await axios.get("http://localhost:8000/api/sites/");
+        const response = await axios.get(`${process.env.NEXT_PUBLIC_API_BASE_URL}/sites/`,{
+          headers:{
+            Authorization: `Bearer ${accessToken}`
+          }
+        });
         setSite(response.data)
       } catch (error) {
         console.log(error)
@@ -80,7 +87,11 @@ const ProfessionalInfo = ({ data, onChange, }: { data: any; onChange: (data: any
 
     const fectchPost = async () => {
       try {
-        const response = await axios.get("http://localhost:8000/api/posts/");
+        const response = await axios.get(`${process.env.NEXT_PUBLIC_API_BASE_URL}/posts/`,{
+          headers:{
+            Authorization: `Bearer ${accessToken}`
+          }
+        });
         setPoste(response.data)
       } catch (error) {
         console.log(error)
@@ -88,6 +99,7 @@ const ProfessionalInfo = ({ data, onChange, }: { data: any; onChange: (data: any
     }
     fectchSite();
     fectchPost();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
   const handleTooltipToggle = (field: string) => {
