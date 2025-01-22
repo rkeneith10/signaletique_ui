@@ -19,10 +19,10 @@ const Layout: React.FC<LayoutProps> = ({ children, isAuthenticated }) => {
       <body className={`bg-white ${inter.className}`}>
         <SidebarProvider>
           <div className="flex h-screen w-screen">
-            {/* Sidebar */}
-            <AppSidebar />
+            {/* Affichage conditionnel de la barre latérale */}
+            {isAuthenticated && <AppSidebar />}
 
-            {/* Content */}
+            {/* Contenu principal */}
             <div className="flex-1">
               <ProgressLoader color="#3B82F6" showSpinner={false} />
               <main className="flex flex-col w-full h-full">
@@ -34,7 +34,7 @@ const Layout: React.FC<LayoutProps> = ({ children, isAuthenticated }) => {
                 )}
                 {!isAuthenticated && children}
               </main>
-              <Toaster position="top-right" richColors/>
+              <Toaster position="top-right" richColors />
             </div>
           </div>
         </SidebarProvider>

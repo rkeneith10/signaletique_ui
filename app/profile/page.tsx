@@ -37,6 +37,7 @@ const Profile = () => {
     if (session && accessToken) {
       getinfo();
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [session, accessToken]);
 
   useEffect(() => {

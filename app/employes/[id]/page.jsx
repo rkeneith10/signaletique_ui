@@ -20,85 +20,25 @@ import { Textarea } from '@/components/ui/textarea';
 import axios from 'axios';
 import { Loader2 } from 'lucide-react';
 import { useSession } from 'next-auth/react';
-import { useRouter } from 'next/navigation';
+import { useRouter } from 'next/router';
 import React, { useEffect, useState } from 'react';
 import { toast } from 'sonner';
 
+const InfoEmploye = () => {
 
-interface FormDataType {
-  id: string,
-  id_adress: string,
-  personalInfo: {
-    first_name: string;
-    last_name: string;
-    date_of_birth: string;
-    marital_status: string;
-    personal_phone_number: string;
-    personal_email: string;
-    numero_rue: string;
-    libelle_adresse: string;
-    villeRecord: string;
-    section_communale: string;
-    from: string;
-  };
-  professionalInfo: {
-    badge_number: string;
-    start_up_date: string;
-    category: string;
-    title_qualification: string;
-    work_phone_number: string;
-    work_email: string;
-    site: string;
-    post: string[];
-  };
-  financialInfo: {
-    bank_account_number: string;
-    bank_account_name: string;
-  };
-  additionalInfo: {
-    contact_name: string;
-    contact_phone_number: string;
-    salary_scale: string;
-    remarques: string;
-  };
-}
-interface Site {
-  id: string;
-  site_name: string;
-  adresse: string
-}
-
-interface Post {
-  id: string;
-  post_name: string;
-}
-interface Option {
-  label: string;
-  value: string
-}
-const InfoEmploye = ({ params }: { params: { id: string } }) => {
-  const { id } = params;
   const { data: session } = useSession();
   const accessToken = session?.accessToken;
   const router = useRouter();
-  const [loading, setLoading] = useState<boolean>(true);
-  //const [visibleTooltip, setVisibleTooltip] = useState<string | null>(null);
-  //const [tooltips, setTooltips] = useState<Record<string, string>>({});
-  const [updating, setUpdating] = useState<boolean>(false);
-  const [selectedOptions, setSelectedOptions] = useState<Option[]>([]);
-
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const [site, setSite] = useState<Site[]>([]);
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const [posts, setPosts] = useState<any[]>([])
-
-  const [info, setInfo] = useState<FormDataType>();
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const [selectedSite, setSelectedSite] = useState<string>("");
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const [selectedPosts, setSelectedPosts] = useState<string[]>([]);
-  // const [postValue, setPostValue] = useState<string[]>([])
-  const [formData, setFormData] = useState<FormDataType>({
+  const { id } = router.query;
+  const [loading, setLoading] = useState(true);
+  const [updating, setUpdating] = useState(false);
+  const [selectedOptions, setSelectedOptions] = useState([]);
+  const [site, setSite] = useState([]);
+  const [posts, setPosts] = useState([]);
+  const [info, setInfo] = useState();
+  const [ setSelectedSite] = useState("");
+  //const [selectedPosts, setSelectedPosts] = useState([]);
+  const [formData, setFormData] = useState({
     id: "",
     id_adress: "",
     personalInfo: {
@@ -136,17 +76,14 @@ const InfoEmploye = ({ params }: { params: { id: string } }) => {
     },
   });
 
-
   const redirect = () => {
-    router.push('/employes')
+    router.push('/employes');
   }
 
   useEffect(() => {
-
     const fetchEmployeeInfo = async () => {
       setLoading(true);
       try {
-
         const response = await axios.get(`${process.env.NEXT_PUBLIC_API_BASE_URL}/employees/${id}/`, {
           headers: {
             Authorization: `Bearer ${accessToken}`
@@ -155,8 +92,6 @@ const InfoEmploye = ({ params }: { params: { id: string } }) => {
         setInfo(response.data);
 
         const response2 = await axios.get(`http://isteah-tech.ddns.net:9097/api/adresseCtrl/${response.data.id_adress}`);
-
-
         setFormData({
           id: response.data.id || "",
           id_adress: response.data.id_adress,
@@ -170,6 +105,7 @@ const InfoEmploye = ({ params }: { params: { id: string } }) => {
             numero_rue: response2.data.numero_rue || "",
             libelle_adresse: response2.data.libelle_adresse || "",
             villeRecord: response2.data.villeRecord || "",
+            section_communale: response2.data.section_communale || "",
             from: response.data.from || "",
           },
           professionalInfo: {
@@ -194,7 +130,6 @@ const InfoEmploye = ({ params }: { params: { id: string } }) => {
           },
         });
         setLoading(false);
-
       } catch (error) {
         setLoading(false);
         if (axios.isAxiosError(error)) {
@@ -207,19 +142,16 @@ const InfoEmploye = ({ params }: { params: { id: string } }) => {
 
     const fetchSite = async () => {
       try {
-
         const response = await axios.get(`${process.env.NEXT_PUBLIC_API_BASE_URL}/sites/`, {
           headers: {
             Authorization: `Bearer ${accessToken}`
           }
         });
-
         setSite(response.data);
       } catch (error) {
         console.error("Error fetching sites:", error);
       }
     };
-
 
     const fetchPost = async () => {
       try {
@@ -229,31 +161,27 @@ const InfoEmploye = ({ params }: { params: { id: string } }) => {
           }
         });
         const data = response.data;
-
-
-        const options = data.map((post: Post) => ({
+        const options = data.map(post => ({
           label: post.post_name,
           value: String(post.id),
         }));
-
         setPosts(options);
+
         const responseEmp = await axios.get(`${process.env.NEXT_PUBLIC_API_BASE_URL}/employees/${id}/`, {
           headers: {
             Authorization: `Bearer ${accessToken}`
           }
         });
 
-        const selectPost: Option[] = [];
-        responseEmp.data?.posts?.forEach((p: string) => {
-          console.log(p)
-          options.forEach((o: Option) => {
+        const selectPost = [];
+        responseEmp.data?.posts?.forEach(p => {
+          options.forEach(o => {
             if (o.value === p) {
-              selectPost.push(o)
+              selectPost.push(o);
             }
-          })
-        })
-        setSelectedOptions(selectPost)
-
+          });
+        });
+        setSelectedOptions(selectPost);
       } catch (error) {
         console.error("Error fetching posts:", error);
       }
@@ -262,14 +190,11 @@ const InfoEmploye = ({ params }: { params: { id: string } }) => {
     fetchEmployeeInfo();
     fetchSite();
     fetchPost();
-
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [id]);
 
-  const handleUpdateInfo = async (e: React.FormEvent<HTMLFormElement>) => {
+  const handleUpdateInfo = async (e) => {
     e.preventDefault();
     setUpdating(true);
-
     try {
       const response = await axios.put(`${process.env.NEXT_PUBLIC_API_BASE_URL}/employees/${id}/`, {
         id: info?.id,
@@ -294,7 +219,6 @@ const InfoEmploye = ({ params }: { params: { id: string } }) => {
         contact_phone_number: formData.additionalInfo.contact_phone_number,
         salary_scale: formData.additionalInfo.salary_scale,
         remarques: formData.additionalInfo.remarques,
-
       }, {
         headers: {
           Authorization: `Bearer ${accessToken}`
@@ -307,11 +231,7 @@ const InfoEmploye = ({ params }: { params: { id: string } }) => {
         numero_rue: formData.personalInfo.numero_rue,
         villeRecord: formData.personalInfo.villeRecord,
         section_communale: formData.personalInfo.section_communale
-
-      }, { headers: { "Content-Type": "application/json" } }
-      )
-
-
+      }, { headers: { "Content-Type": "application/json" } });
 
       if (response.status !== 200 || response2.status !== 200) {
         throw new Error(response.data.message || "Une erreur s'est produite");
@@ -320,7 +240,7 @@ const InfoEmploye = ({ params }: { params: { id: string } }) => {
       setTimeout(() => {
         redirect();
       }, 3000);
-      setFormData((prevState) => ({
+      setFormData(prevState => ({
         ...prevState,
         personalInfo: {
           ...prevState.personalInfo,
@@ -339,20 +259,14 @@ const InfoEmploye = ({ params }: { params: { id: string } }) => {
           ...response.data.additionalInfo,
         },
       }));
-
-    } catch (error: unknown) {
-      // Gérer l'erreur de mise à jour
+    } catch (error) {
       setUpdating(false);
       toast.error("Erreur lors de la modification des informations");
-
-
       console.error("Update error:", error);
     } finally {
-      // Remet à jour l'état de `updating` une fois l'opération terminée
       setUpdating(false);
     }
   };
-
 
 
   return (

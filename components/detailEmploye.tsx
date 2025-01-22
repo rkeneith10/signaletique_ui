@@ -24,7 +24,7 @@ interface Employe {
   id: string;
   id_adress: number;
   first_name: string,
-  photo: string,
+  photo?: string,
   last_name: string,
   marital_status: string,
   bank_account_number: string,
@@ -145,11 +145,11 @@ const DetailEmploye: React.FC<DetailEmploye> = ({ isOpen, onClose, employe }) =>
               {employe ? (
                 <>
                   <div className=" flex items-center justify-center mb-4" >
-                    {employe.photo ? (
+                    {employe?.photo ? (
                       <Avatar className="h-24 w-24 mt-2">
                         <AvatarImage src={employe.photo} alt="Photo de profil" />
                       </Avatar>
-                    ) : ""}
+                    ) : null}
                   </div>
                   <div className="grid grid-cols-2 gap-4">
                     <div className="text-gray-900">

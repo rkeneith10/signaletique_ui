@@ -8,6 +8,7 @@ import {
   AvatarFallback,
   AvatarImage,
 } from "@/components/ui/avatar";
+import { useRouter } from 'next/router';
 //import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -27,9 +28,10 @@ pdfjs.GlobalWorkerOptions.workerSrc = new URL(
 
 
 
-const AddFileEmploye = ({ params }: { params: { id: string } }) => {
-  const { id } = params;
-  const {data:session} = useSession();
+const AddFileEmploye = () => {
+  const { data: session } = useSession();
+  const router = useRouter();
+  const { id } = router.query;
   const accessToken = session?.accessToken;
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -53,9 +55,9 @@ const AddFileEmploye = ({ params }: { params: { id: string } }) => {
 
   const fetchFile = async () => {
     try {
-      const response = await axios.get(`${process.env.NEXT_PUBLIC_API_BASE_URL}/files/by-employee/${id}`,{
-        headers:{
-          Authorization:`Bearer ${accessToken}`
+      const response = await axios.get(`${process.env.NEXT_PUBLIC_API_BASE_URL}/files/by-employee/${id}`, {
+        headers: {
+          Authorization: `Bearer ${accessToken}`
         }
       });
       setFileData(response.data);
@@ -66,9 +68,9 @@ const AddFileEmploye = ({ params }: { params: { id: string } }) => {
 
   const fetchEmploye = async () => {
     try {
-      const response = await axios.get(`${process.env.NEXT_PUBLIC_API_BASE_URL}/employees/${id}`,{
-        headers:{
-          Authorization:`Bearer ${accessToken}`
+      const response = await axios.get(`${process.env.NEXT_PUBLIC_API_BASE_URL}/employees/${id}`, {
+        headers: {
+          Authorization: `Bearer ${accessToken}`
         }
       });
       setInfoEmp(response.data);
@@ -109,12 +111,12 @@ const AddFileEmploye = ({ params }: { params: { id: string } }) => {
       try {
         const response = await axios.post(
           `${process.env.NEXT_PUBLIC_API_BASE_URL}/employees/${id}/upload-photo/`,
-          formData,{
-            headers:{
-              Authorization:`Bearer ${accessToken}`,
-              'Content-Type': 'multipart/form-data', 
-            }
+          formData, {
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+            'Content-Type': 'multipart/form-data',
           }
+        }
         );
         toast.success("Photo de profil mise à jour");
         const uploadedImageUrl = response.data.photo_url;
@@ -180,8 +182,9 @@ const AddFileEmploye = ({ params }: { params: { id: string } }) => {
               </div>
               <div className="">
                 <div className='flex flex-row items-center space-x-4 mb-4 p-4'>
+                  {id && typeof id === "string" && <FormModalDossierEmp employeeId={id} onSuccess={handleSuccess} onFailed={handleFailed} onFailedType={handleFailedType} />}
 
-                  <FormModalDossierEmp employeeId={id} onSuccess={handleSuccess} onFailed={handleFailed} onFailedType={handleFailedType} />
+
                   {/* <Link href="/" className='flex items-center '>
                     <Button
                       disabled={!checkedItem} // Actif uniquement si une seule ligne est sélectionnée
@@ -213,41 +216,41 @@ const AddFileEmploye = ({ params }: { params: { id: string } }) => {
                       </TableRow>
                     </TableHeader>
                     <TableBody>
-                      {fileData.length===0 ? (
-                       <TableRow>
-                       <TableCell colSpan={4} className="text-center text-gray-800 font-semibold">
-                         Aucun dossier disponible pour cet employé.
-                       </TableCell>
-                     </TableRow>
-                      ) : 
-                      fileData.map((item, index) => (
-                        <TableRow key={item.id}>
-                          <TableCell>
-                            <Checkbox
-                              checked={checkedItem === item.id}
-                              onCheckedChange={() => handleChangeCheck(item.id)}
-                            />
+                      {fileData.length === 0 ? (
+                        <TableRow>
+                          <TableCell colSpan={4} className="text-center text-gray-800 font-semibold">
+                            Aucun dossier disponible pour cet employé.
                           </TableCell>
-                          <TableCell>{index + 1}</TableCell>
-                          <TableCell>{item.file_type}</TableCell>
-                          <TableCell>
-                            <div>
-                              {item.file.endsWith('.pdf') ? (
-                                <button>
-
-                                  <a href={item.file} target="_blank" rel="noopener noreferrer"> <FaFilePdf size={24} className="text-red-600" /></a>
-                                </button>
-                              ) : item.file.endsWith('.png') || item.file.endsWith('.jpeg') || item.file.endsWith('.jpg') ? (
-                                <FaImage size={24} />
-                              ) : (
-                                <FaFilePdf size={24} />
-                              )}
-                            </div>
-                          </TableCell>
-
                         </TableRow>
-                      ))
-                       }
+                      ) :
+                        fileData.map((item, index) => (
+                          <TableRow key={item.id}>
+                            <TableCell>
+                              <Checkbox
+                                checked={checkedItem === item.id}
+                                onCheckedChange={() => handleChangeCheck(item.id)}
+                              />
+                            </TableCell>
+                            <TableCell>{index + 1}</TableCell>
+                            <TableCell>{item.file_type}</TableCell>
+                            <TableCell>
+                              <div>
+                                {item.file.endsWith('.pdf') ? (
+                                  <button>
+
+                                    <a href={item.file} target="_blank" rel="noopener noreferrer"> <FaFilePdf size={24} className="text-red-600" /></a>
+                                  </button>
+                                ) : item.file.endsWith('.png') || item.file.endsWith('.jpeg') || item.file.endsWith('.jpg') ? (
+                                  <FaImage size={24} />
+                                ) : (
+                                  <FaFilePdf size={24} />
+                                )}
+                              </div>
+                            </TableCell>
+
+                          </TableRow>
+                        ))
+                      }
                     </TableBody>
                   </Table>
                   {/* <Pagination>

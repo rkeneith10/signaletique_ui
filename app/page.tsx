@@ -1,11 +1,13 @@
 'use client';
+import { toast } from 'sonner';
 import { Loader2 } from 'lucide-react';
 import { signIn } from 'next-auth/react';
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { AiOutlineLock, AiOutlineMail } from "react-icons/ai";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
-import { toast } from 'sonner';
+import Layout from '@/components/rootLayout';
+
 
 export default function Home() {
   const [show, setShow] = useState(false);
@@ -20,6 +22,7 @@ export default function Home() {
 
     if (username.trim() === "" || password.trim() === "") {
       toast.error("Veuillez remplir tous les champs")
+     
 
     } else {
       setLoading(true);
@@ -43,7 +46,7 @@ export default function Home() {
   };
 
   return (
-    <>
+    <Layout isAuthenticated={false}>
       <section className="bg-gray-300 min-h-screen">
         <div className="flex flex-col items-center justify-center px-6 py-8 mx-auto md:h-screen lg:py-0">
           <div className="flex items-center mb-6 text-2xl font-semibold text-gray-900">
@@ -104,14 +107,12 @@ export default function Home() {
                   </div>
                   <a href="#" className="text-sm font-medium text-gray-900 hover:underline">Mot de passe oublié ?</a>
                 </div>
-                <button type="submit" className="w-full rounded-md bg-indigo-500 py-2 px-4 text-white font-medium hover:bg-indigo-600">
-                {loading ? (
-                  <>
-                    Se Connecter <Loader2 className="animate-spin" />
-                  </>
-                ) : (
-                  <div>Se Connecter</div>
-                )}
+                <button type="submit" disabled={loading} className="w-full rounded-md bg-indigo-500 py-2 px-4 text-white font-medium hover:bg-indigo-600 flex justify-center items-center">
+                  {loading ? (
+                    <>
+                      Se connecter <Loader2 className="animate-spin ml-2" />
+                    </>
+                  ) : " Se Connecter"}
                 </button>
                 <p className="text-sm font-light text-gray-500">
                   Vous n’avez pas encore de compte ?  <a href="#" className="font-medium text-black hover:underline">Inscrivez-vous</a>
@@ -121,6 +122,6 @@ export default function Home() {
           </div>
         </div>
       </section>
-    </>
+    </Layout>
   );
 }

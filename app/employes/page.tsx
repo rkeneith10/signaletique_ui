@@ -86,7 +86,8 @@ const Employes = () => {
   const [empData, setEmpData] = useState<Employe[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [checkedItem, setCheckedItem] = useState<string | null>();
-  const [selectedEmp, setSelectedEmp] = useState<Employe | undefined>()
+  const [selectedEmp, setSelectedEmp] = useState<Employe | undefined>(undefined);
+
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 8;
   const totalPages = Math.ceil(empData.length / itemsPerPage)

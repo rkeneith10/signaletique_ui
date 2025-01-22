@@ -7,7 +7,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import axios from 'axios';
 import { Loader2 } from 'lucide-react';
-import {useRouter} from 'next/navigation';
+import {useRouter} from 'next/router';
 import { useEffect, useState } from 'react';
 import { FaQuestionCircle } from 'react-icons/fa';
 import { useSession } from 'next-auth/react';
@@ -24,10 +24,11 @@ interface TooltipAttributes {
   nom_champ: string;
   message_tooltip: string;
 }
-const DetailSite = ({ params }: { params: { id: string } }) => {
-  const { id } = params;
+const DetailSite = () => {
+  
   const { data: session } = useSession(); 
   const router = useRouter();
+  const { id } = router.query;
   const [loading, setLoading] = useState<boolean>(true);
   const [visibleTooltip, setVisibleTooltip] = useState<string | null>(null);
   const [tooltips, setTooltips] = useState<Record<string, string>>({});
