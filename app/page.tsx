@@ -1,12 +1,13 @@
 'use client';
-import { toast } from 'sonner';
+import Layout from '@/components/rootLayout';
 import { Loader2 } from 'lucide-react';
 import { signIn } from 'next-auth/react';
+import Image from 'next/image';
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { AiOutlineLock, AiOutlineMail } from "react-icons/ai";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
-import Layout from '@/components/rootLayout';
+import { toast } from 'sonner';
 
 
 export default function Home() {
@@ -22,7 +23,7 @@ export default function Home() {
 
     if (username.trim() === "" || password.trim() === "") {
       toast.error("Veuillez remplir tous les champs")
-     
+
 
     } else {
       setLoading(true);
@@ -50,9 +51,18 @@ export default function Home() {
       <section className="bg-gray-300 min-h-screen">
         <div className="flex flex-col items-center justify-center px-6 py-8 mx-auto md:h-screen lg:py-0">
           <div className="flex items-center mb-6 text-2xl font-semibold text-gray-900">
-
-            ISTEAH
+            <div className="">
+              <Image
+              className='rounded-full w-36 h-36 '
+                src="/images/images.jpeg"
+                alt="Description de l'image"
+                width={100}
+                height={100}
+                priority
+              />
+            </div>
           </div>
+
           <div className="w-full bg-white rounded-lg shadow  md:mt-0 sm:max-w-md xl:p-0">
             <div className="p-6 space-y-4 md:space-y-6 sm:p-8">
               <h1 className="text-xl font-bold leading-tight tracking-tight text-gray-900 md:text-2xl ">
