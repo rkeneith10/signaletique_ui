@@ -76,7 +76,7 @@ const authOptions = {
     strategy: "jwt",
     maxAge: 900,
   },
-  secret: process.env.NEXTAUTH_SECRET,  
+  secret: "Signaletique",  
 };
 
 const handler = NextAuth(authOptions);
