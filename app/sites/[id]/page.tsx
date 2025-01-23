@@ -7,7 +7,8 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import axios from 'axios';
 import { Loader2 } from 'lucide-react';
-import {useRouter} from 'next/router';
+//import {useRouter} from 'next/router';
+import {useRouter,useParams} from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { FaQuestionCircle } from 'react-icons/fa';
 import { useSession } from 'next-auth/react';
@@ -27,8 +28,10 @@ interface TooltipAttributes {
 const DetailSite = () => {
   
   const { data: session } = useSession(); 
+ 
   const router = useRouter();
-  const { id } = router.query;
+  const params =useParams();
+  const id  = params.id
   const [loading, setLoading] = useState<boolean>(true);
   const [visibleTooltip, setVisibleTooltip] = useState<string | null>(null);
   const [tooltips, setTooltips] = useState<Record<string, string>>({});
@@ -64,7 +67,6 @@ const DetailSite = () => {
     setShowModal(false);
     router.push('/sites')
   }
-
 
   useEffect(() => {
     const fetchInfo = async () => {
@@ -113,8 +115,10 @@ const DetailSite = () => {
     };
 
 
-    fetchInfo();
-    fetchTooltips();
+     if (id) {
+      fetchInfo();
+      fetchTooltips();
+    }
 
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [id]);
@@ -159,6 +163,10 @@ const DetailSite = () => {
       setUpdating(false);
     }
   };
+
+  // if (!isClient) {
+  //   return null; // Return null or a loading state before the router is ready
+  // }
 
 
   return (

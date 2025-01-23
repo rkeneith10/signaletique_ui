@@ -8,7 +8,7 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import axios from 'axios';
 import { Loader2 } from 'lucide-react';
-import { useRouter } from 'next/router';
+import { useRouter ,useParams} from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { FaQuestionCircle } from 'react-icons/fa';
 import { toast } from 'sonner';
@@ -29,7 +29,8 @@ interface TooltipAttributes {
 }
 const DetailPost = () => {
   const router=useRouter();
-  const { id } = router.query;
+  const params = useParams();
+  const id  = params.id;
   const { data: session } = useSession();
   
   const [loading, setLoading] = useState<boolean>(true);

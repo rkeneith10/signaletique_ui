@@ -20,7 +20,7 @@ const Dashboard = () => {
 
   useEffect(() => {
     document.title = "Tableau de bord";
-    console.log(accessToken)
+    
     const fetchData = async () => {
       try {
         const responseSite = await axios.get(`${process.env.NEXT_PUBLIC_API_BASE_URL}/sites/`,{
@@ -51,7 +51,7 @@ const Dashboard = () => {
 
     fetchData();
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [])
+  }, [accessToken])
 
   return (
     <Layout isAuthenticated={true}>
@@ -112,7 +112,7 @@ const Dashboard = () => {
                         <FaClipboardList size={20} className="text-blue-500" />
                       </span>
                     </div>
-                    <Link href="../adresses">
+                    <Link href="../postes">
                       <Button variant='outline' className="border-blue-500 text-blue-500 hover:bg-blue-100 bg-white">
                         Voir tous
                       </Button>

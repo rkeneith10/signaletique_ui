@@ -85,7 +85,7 @@ const DetailEmploye: React.FC<DetailEmploye> = ({ isOpen, onClose, employe }) =>
 
   const fetchAdresse = async () => {
     try {
-      const response = await axios.get(`http://localhost:3001/api/adresseCtrl/${employe?.id_adress}`);
+      const response = await axios.get(`http://isteah-tech.ddns.net:9097/api/adresseCtrl/${employe?.id_adress}`);
       console.log(response)
       setAdresseInfo(response.data);
     } catch (error) {
@@ -187,12 +187,12 @@ const DetailEmploye: React.FC<DetailEmploye> = ({ isOpen, onClose, employe }) =>
                     <div className="text-gray-900">
                       <strong>Email personnel:</strong> {employe.personal_email || 'N/A'}
                     </div>
-                    <div className="text-gray-900">
+                    {/* <div className="text-gray-900">
                       <strong>NIF:</strong> {employe.nif || 'N/A'}
                     </div>
                     <div className="text-gray-900">
                       <strong>NINU:</strong> {employe.ninu || 'N/A'}
-                    </div>
+                    </div> */}
                     <div className="text-gray-900">
                       <strong>Téléphone professionnel:</strong> {employe.work_phone_number || 'N/A'}
                     </div>

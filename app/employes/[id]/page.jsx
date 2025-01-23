@@ -20,8 +20,8 @@ import { Textarea } from '@/components/ui/textarea';
 import axios from 'axios';
 import { Loader2 } from 'lucide-react';
 import { useSession } from 'next-auth/react';
-import { useRouter } from 'next/router';
-import React, { useEffect, useState } from 'react';
+import { useParams, useRouter } from 'next/navigation';
+import { useEffect, useState } from 'react';
 import { toast } from 'sonner';
 
 const InfoEmploye = () => {
@@ -29,14 +29,15 @@ const InfoEmploye = () => {
   const { data: session } = useSession();
   const accessToken = session?.accessToken;
   const router = useRouter();
-  const { id } = router.query;
+  const params = useParams();
+  const id = params.id;
   const [loading, setLoading] = useState(true);
   const [updating, setUpdating] = useState(false);
   const [selectedOptions, setSelectedOptions] = useState([]);
   const [site, setSite] = useState([]);
   const [posts, setPosts] = useState([]);
   const [info, setInfo] = useState();
-  const [ setSelectedSite] = useState("");
+  const [setSelectedSite] = useState("");
   //const [selectedPosts, setSelectedPosts] = useState([]);
   const [formData, setFormData] = useState({
     id: "",

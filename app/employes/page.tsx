@@ -42,6 +42,7 @@ import Link from 'next/link';
 import { useEffect, useState } from 'react';
 import { FaEdit, FaFileUpload, FaTrash } from 'react-icons/fa';
 import FileEmploye from '@/components/fileEmploye';
+import { toast } from 'sonner';
 
 interface Employe {
   id: string;
@@ -153,22 +154,48 @@ const Employes = () => {
     try {
       const accessToken = session?.accessToken;
       if (checkedItem) {
-
         const idToDelete = checkedItem;
-        await axios.delete(`${process.env.NEXT_PUBLIC_API_BASE_URL}/employees/${idToDelete}/`,{
-          headers: {
-            Authorization: `Bearer ${accessToken}`,  
-          },
-        });
-        confirmDelete()
-        setEmpData(empData.filter((item) => item.id !== idToDelete));
+  
+        // Récupérer les informations de l'employé pour obtenir l'id de l'adresse
+        const employeeResponse = await axios.get(
+          `${process.env.NEXT_PUBLIC_API_BASE_URL}/employees/${idToDelete}/`,
+          {
+            headers: {
+              Authorization: `Bearer ${accessToken}`,
+            },
+          }
+        );
+  
+        if (employeeResponse.status === 200) {
+          const { id_adress } = employeeResponse.data; // Supposons que l'id de l'adresse soit dans ce champ
+  
+          // Supprimer l'employé
+          await axios.delete(`${process.env.NEXT_PUBLIC_API_BASE_URL}/employees/${idToDelete}/`, {
+            headers: {
+              Authorization: `Bearer ${accessToken}`,
+            },
+          });
+  
+          // Si l'employé a été supprimé avec succès, supprimer l'adresse associée
+          if (id_adress) {
+            await axios.delete(`http://isteah-tech.ddns.net:9097/api/adresseCtrl/${id_adress}`, {
+              headers: { "Content-Type": "application/json" },
+            });
+          }
+  
+          confirmDelete();
+          setEmpData(empData.filter((item) => item.id !== idToDelete));
+        }
       }
+  
       setCheckedItem(null);
       setShowModalDelete(false);
     } catch (error) {
       console.error("Erreur lors de la suppression :", error);
+      toast.error("Une erreur est survenue lors de la suppression.");
     }
   };
+  
 
   const fetchSite = async () => {
     try {
@@ -275,7 +302,13 @@ const Employes = () => {
                           </TableRow>
                         </TableHeader>
                         <TableBody>
-                          {filteredInfo.slice(startIndex, startIndex + itemsPerPage).map((item, index) => (
+                          {
+                          filteredInfo.length===0 ? (<TableRow>
+                            <TableCell colSpan={4} className="text-center text-gray-800 font-semibold">
+                              Aucun dossier disponible pour l&#39;employé .
+                            </TableCell>
+                          </TableRow>) :
+                          filteredInfo.slice(startIndex, startIndex + itemsPerPage).map((item, index) => (
                             <TableRow key={item.id}>
                               <TableCell>
                                 <Checkbox
@@ -340,7 +373,8 @@ const Employes = () => {
                                 </TooltipProvider>
                               </TableCell>
                             </TableRow>
-                          ))}
+                          ))
+                          }
                         </TableBody>
                       </Table>
                       <Pagination>

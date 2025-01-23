@@ -8,7 +8,7 @@ import {
   AvatarFallback,
   AvatarImage,
 } from "@/components/ui/avatar";
-import { useRouter } from 'next/router';
+import { useParams } from 'next/navigation';
 //import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -30,8 +30,8 @@ pdfjs.GlobalWorkerOptions.workerSrc = new URL(
 
 const AddFileEmploye = () => {
   const { data: session } = useSession();
-  const router = useRouter();
-  const { id } = router.query;
+  const params = useParams();
+  const id = params.id;
   const accessToken = session?.accessToken;
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -84,10 +84,12 @@ const AddFileEmploye = () => {
 
 
   useEffect(() => {
-    fetchFile();
-    fetchEmploye();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+    if (accessToken && id) {
+      fetchFile();
+      fetchEmploye();
+    }
+
+  }, [accessToken, id]);
 
   // Déclencher input file quand on clique sur l'avatar
   const handleAvatarClick = () => {
@@ -219,7 +221,7 @@ const AddFileEmploye = () => {
                       {fileData.length === 0 ? (
                         <TableRow>
                           <TableCell colSpan={4} className="text-center text-gray-800 font-semibold">
-                            Aucun dossier disponible pour cet employé.
+                            Aucun dossier disponible pour l&#39;employé {infoEmp.last_name} {infoEmp.first_name}.
                           </TableCell>
                         </TableRow>
                       ) :
