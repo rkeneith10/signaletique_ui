@@ -1,14 +1,16 @@
 'use client';
 import Layout from '@/components/rootLayout';
 import { Loader2 } from 'lucide-react';
-import { signIn } from 'next-auth/react';
 import Image from 'next/image';
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { AiOutlineLock, AiOutlineMail } from "react-icons/ai";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
-import { toast } from 'sonner';
 
+import { authenticate } from '@/lib/action';
+import { useSearchParams } from 'next/navigation';
+import { useActionState } from 'react';
+import { MdError } from 'react-icons/md';
 
 export default function Home() {
   const [show, setShow] = useState(false);
@@ -17,34 +19,41 @@ export default function Home() {
   const [loading, setLoading] = useState<boolean>(false);
   const router = useRouter();
 
+
+  const searchParams = useSearchParams();
+  const callbackUrl = searchParams.get('callbackUrl') || '/dashboard';
+  const [errorMessage, formAction, isPending] = useActionState(
+    authenticate,
+    undefined,
+  );
   const handleClick = () => setShow(!show);
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+  // const handleSubmit = async (e: React.FormEvent) => {
+  //   e.preventDefault();
 
-    if (username.trim() === "" || password.trim() === "") {
-      toast.error("Veuillez remplir tous les champs")
+  //   if (username.trim() === "" || password.trim() === "") {
+  //     toast.error("Veuillez remplir tous les champs")
 
 
-    } else {
-      setLoading(true);
-      const result = await signIn('credentials', {
-        redirect: false,
-        username,
-        password,
-      });
+  //   } else {
+  //     setLoading(true);
+  //     const result = await signIn('credentials', {
+  //       redirect: false,
+  //       username,
+  //       password,
+  //     });
 
-      if (result?.ok) {
-        router.push('/dashboard');
-        setLoading(false);
-      } else {
-        toast.error("Email ou mot de passe incorrect")
+  //     if (result?.ok) {
+  //       router.push('/dashboard');
+  //       setLoading(false);
+  //     } else {
+  //       toast.error("Email ou mot de passe incorrect")
 
-        setLoading(false);
-        console.error('Login failed', result?.error);
-        //toast.error(`Email ou mot de passe incorrect`);
-      }
-    }
-  };
+  //       setLoading(false);
+  //       console.error('Login failed', result?.error);
+  //       //toast.error(`Email ou mot de passe incorrect`);
+  //     }
+  //   }
+  // };
 
   return (
     <Layout isAuthenticated={false}>
@@ -53,7 +62,7 @@ export default function Home() {
           <div className="flex items-center mb-6 text-2xl font-semibold text-gray-900">
             <div className="">
               <Image
-              className='rounded-full w-36 h-36 '
+                className='rounded-full w-36 h-36 '
                 src="/images/images.jpeg"
                 alt="Description de l'image"
                 width={100}
@@ -68,7 +77,7 @@ export default function Home() {
               <h1 className="text-xl font-bold leading-tight tracking-tight text-gray-900 md:text-2xl ">
                 Connectez-vous à votre compte
               </h1>
-              <form className="space-y-4 md:space-y-6" onSubmit={handleSubmit}>
+              <form className="space-y-4 md:space-y-6" action={formAction}>
                 <div>
                   <label htmlFor="username" className="block mb-2 text-sm font-medium text-gray-900 ">Votre nom d&#39;utilisateur</label>
                   <div className="relative">
@@ -124,6 +133,19 @@ export default function Home() {
                     </>
                   ) : " Se Connecter"}
                 </button>
+                <div
+                  className="flex h-8 items-end space-x-1"
+                  aria-live="polite"
+                  aria-atomic="true"
+                >
+                  {errorMessage && (
+                    <>
+                      <MdError className="h-5 w-5 text-red-500" />
+                      <p className="text-sm text-red-500">{errorMessage}</p>
+                    </>
+                  )}
+                </div>
+                <input type="hidden" name="redirectTo" value={callbackUrl} />
                 <p className="text-sm font-light text-gray-500">
                   Vous n’avez pas encore de compte ?  <a href="#" className="font-medium text-black hover:underline">Inscrivez-vous</a>
                 </p>

@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import localFont from "next/font/local";
-import { AuthProv } from "@/layout/authProv";
+
 import "./globals.css";
 
 
@@ -30,9 +30,9 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-      <AuthProv>
-            {children}
-          </AuthProv>
+
+        {children}
+
       </body>
     </html>
   );

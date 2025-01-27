@@ -4,7 +4,7 @@ import Layout from '@/components/rootLayout';
 import SearchInput from '@/components/searchInput';
 import { Button } from '@/components/ui/button';
 import { Checkbox } from "@/components/ui/checkbox";
-
+import Cookie from 'js-cookie';
 import FormModalSite from '@/components/formModalSite';
 import SkeletonTable from '@/components/skeletonTable';
 import {
@@ -44,7 +44,7 @@ const Sites = () => {
   const startIndex = (currentPage - 1) * itemsPerPage;
   const [showModal, setShowModal] = useState<boolean>(false);
   const [showModalDelete, setShowModalDelete] = useState<boolean>(false);
-
+ const [accessToken, setAccessToken] = useState<string | undefined>(undefined);
   const [modalMessage] = useState("")
 
   const filteredInfo = siteData.filter((st) =>
@@ -72,17 +72,21 @@ const Sites = () => {
   };
   useEffect(() => {
     document.title = "Sites"
+    const StoredAccessToken = Cookie.get('accessToken');
+    if (accessToken) {
+      setAccessToken(StoredAccessToken);
+    }
     fetchPost();
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
-  const { data: session } = useSession(); 
-  const fetchPost = async () => {
+  // const { data: session } = useSession();
+   const fetchPost = async () => {
     
     setLoading(true);
     
     try {
-      const accessToken = session?.accessToken as string;
+      
       const response = await axios.get(`${process.env.NEXT_PUBLIC_API_BASE_URL}/sites`, {
         headers: {
           Authorization: `Bearer ${accessToken}`,  // Utiliser le token d'accès
@@ -99,7 +103,7 @@ const Sites = () => {
 
   const handleDelete = async () => {
     try {
-      const accessToken = session?.accessToken as string;
+   
       if (checkedItem.length === 1) {
 
         const idToDelete = checkedItem[0];
