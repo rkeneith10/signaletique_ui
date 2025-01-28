@@ -1,8 +1,8 @@
 import NextAuth from 'next-auth';
 import Credentials from 'next-auth/providers/credentials';
+import { cookies } from 'next/headers';
 import { z } from 'zod';
 import { authConfig } from './auth.config';
-import { cookies } from 'next/headers'
 
 export const { auth, signIn, signOut } = NextAuth({
   ...authConfig,
@@ -23,7 +23,7 @@ export const { auth, signIn, signOut } = NextAuth({
               password
             }),
           });
-
+          // console.log(res)
           const user = await res.json();
 
 
@@ -36,11 +36,12 @@ export const { auth, signIn, signOut } = NextAuth({
               },
             });
             const userInfo = await userInfoRes.json();
+            console.log(userInfo)
             const cookieStore = await cookies()
             cookieStore.set('accessToken', `${user.access}`, { httpOnly: false });
             cookieStore.set('refreshToken', `${user.refresh}`, { httpOnly: false });
             cookieStore.set('image', `${userInfo.profile || null}`, { httpOnly: false });
-            cookieStore.set('name', `${userInfo.username || null}`,{ httpOnly: false })
+            cookieStore.set('name', `${userInfo.username || null}`, { httpOnly: false })
             return {
               accessToken: user.access,
               refreshToken: user.refresh,
