@@ -41,12 +41,12 @@ export const { auth, signIn, signOut } = NextAuth({
             cookieStore.set('refreshToken', `${user.refresh}`, { httpOnly: false });
             cookieStore.set('image', `${userInfo.profile || null}`, { httpOnly: false });
             cookieStore.set('name', `${userInfo.username || null}`,{ httpOnly: false })
-            // return {
-            //   accessToken: user.access,
-            //   refreshToken: user.refresh,
-            //   name: userInfo.username,
-            //   image: userInfo.profile || null,
-            // };
+            return {
+              accessToken: user.access,
+              refreshToken: user.refresh,
+              name: userInfo.username,
+              image: userInfo.profile || null,
+            };
           } else if (!user) { return null }
         }
         return null;

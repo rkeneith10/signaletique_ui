@@ -1,14 +1,15 @@
+'use client'
 import {
   Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle, DialogTrigger,
 } from "@/components/ui/dialog";
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { postDataApi } from "@/lib/action";
 import axios from 'axios';
 import { Loader2 } from "lucide-react";
-import { useEffect, useState } from 'react';
+import { Dispatch, SetStateAction, useEffect, useState } from 'react';
 import { FaPlus, FaQuestionCircle } from 'react-icons/fa';
-import { Button } from './ui/button';
-import { useSession } from "next-auth/react";
+import { Button } from "./ui/button";
 
 interface TooltipAttributes {
   id_tooltip: number;
@@ -21,12 +22,12 @@ interface SiteModalProps {
 
   onSuccess: () => void;
   onFailed: () => void;
+  open:boolean,
+  setOpen: Dispatch<SetStateAction<boolean>>
 
 }
 
-const FormModalSite: React.FC<SiteModalProps> = ({ onSuccess, onFailed }) => {
-  const {data:session}=useSession();
-  const accessToken= session?.accessToken;
+const FormModalSite: React.FC<SiteModalProps> = ({ onSuccess, onFailed, setOpen, open}) => {
   const [visibleTooltip, setVisibleTooltip] = useState<string | null>(null);
   const [tooltips, setTooltips] = useState<Record<string, string>>({});
   const [adding, setAdding] = useState(false);
@@ -77,10 +78,8 @@ const FormModalSite: React.FC<SiteModalProps> = ({ onSuccess, onFailed }) => {
     setAdding(true);
 
     try {
-      const response = await axios.post(`${process.env.NEXT_PUBLIC_API_BASE_URL}/sites/`, site, {
-        headers: { Authorization:`Bearer ${accessToken}`,"Content-Type": "application/json" },
-      });
-      if (response.status === 201) {
+      const response = await postDataApi('sites', site) 
+      if (response?.success) {
         setSite({
           site_name: "",
           adresse: "",
@@ -123,7 +122,7 @@ const FormModalSite: React.FC<SiteModalProps> = ({ onSuccess, onFailed }) => {
   }, []);
   return (
     <div>
-      <Dialog>
+      <Dialog  open={open} onOpenChange={setOpen}>
         <DialogTrigger asChild>
           <Button className="bg-green-500 text-white px-4 py-2 hover:bg-green-400 font-semibold hover:text-white" variant="outline"> <FaPlus className='mr-2' />Ajouter</Button>
         </DialogTrigger>

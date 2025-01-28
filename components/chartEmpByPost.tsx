@@ -1,7 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
-import axios from 'axios';
-import { useSession } from "next-auth/react";
+import { fetchDataApi } from "@/lib/action";
 import { useEffect, useState } from 'react';
 import { Bar, BarChart, CartesianGrid, Tooltip, XAxis } from 'recharts';
 
@@ -17,8 +16,6 @@ interface Post {
 }
 
 const ChartEmpByPost = () => {
-  const { data: session } = useSession();
-  const accessToken = session?.accessToken;
   const [employes, setEmployes] = useState([]);
   const [chartData, setChartData] = useState<ChartData[]>([]);
   const [posts, setPosts] = useState<Post[]>([]);  // Utilisation cohérente de 'posts'
@@ -57,12 +54,8 @@ const ChartEmpByPost = () => {
   useEffect(() => {
     const fetchPosts = async () => {
       try {
-        const response = await axios.get(`${process.env.NEXT_PUBLIC_API_BASE_URL}/posts/`, {
-          headers: {
-            Authorization: `Bearer ${accessToken}`
-          }
-        });
-        setPosts(response.data);  // Supposons que chaque élément contient { id, post_name }
+        const response = await fetchDataApi('posts') 
+        setPosts(response);  // Supposons que chaque élément contient { id, post_name }
       } catch (error) {
         console.error('Erreur lors de la récupération des postes:', error);
       }
@@ -71,12 +64,8 @@ const ChartEmpByPost = () => {
 
     const fetchEmployees = async () => {
       try {
-        const response = await axios.get(`${process.env.NEXT_PUBLIC_API_BASE_URL}/employees/`, {
-          headers: {
-            Authorization: `Bearer ${accessToken}`
-          }
-        });
-        setEmployes(response.data);
+        const response = await fetchDataApi('employees')
+        setEmployes(response);
       } catch (error) {
         console.log(error);
       }

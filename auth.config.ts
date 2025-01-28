@@ -7,7 +7,7 @@ export const authConfig = {
   callbacks: {
     authorized({ auth, request: { nextUrl } }) {
       const isLoggedIn = !!auth?.user;
-      const isOnDashboard = nextUrl.pathname.startsWith('/dashboard') || nextUrl.pathname.startsWith('/sites');
+      const isOnDashboard = nextUrl.pathname.startsWith('/dashboard') || nextUrl.pathname.startsWith('/sites') || nextUrl.pathname.startsWith('/postes') || nextUrl.pathname.startsWith('/employes') || nextUrl.pathname.startsWith('/profile');
       const isOnSite = nextUrl.pathname.startsWith('/sites');
       if (isOnDashboard) {
         if (isLoggedIn) return true;
