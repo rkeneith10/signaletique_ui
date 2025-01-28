@@ -1,3 +1,4 @@
+import axios from 'axios';
 import NextAuth from 'next-auth';
 import Credentials from 'next-auth/providers/credentials';
 import { cookies } from 'next/headers';
@@ -15,27 +16,29 @@ export const { auth, signIn, signOut } = NextAuth({
 
         if (parsedCredentials.success) {
           const { username, password } = parsedCredentials.data;
-          const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/login/`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
+          const res = await axios.post(
+            `${process.env.NEXT_PUBLIC_API_BASE_URL}/login/`,
+            {
               username,
-              password
-            }),
-          });
-          // console.log(res)
-          const user = await res.json();
-
-
-          if (res.ok && user.access) {
-            const userInfoRes = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/profile/`, {
-              method: 'GET',
+              password,
+            },
+            {
               headers: {
-                'Authorization': `Bearer ${user.access}`,
+                'Content-Type': 'application/json',
+              },
+            }
+          );
+          const user = res.data;
+
+
+          if (res.status == 200 && user.access) {
+            const userInfoRes = await axios.get(`${process.env.NEXT_PUBLIC_API_BASE_URL}/profile/`, {
+              headers: {
+                Authorization: `Bearer ${user.access}`,
                 'Content-Type': 'application/json',
               },
             });
-            const userInfo = await userInfoRes.json();
+            const userInfo = userInfoRes.data;
             console.log(userInfo)
             const cookieStore = await cookies()
             cookieStore.set('accessToken', `${user.access}`, { httpOnly: false });
