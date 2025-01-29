@@ -23,29 +23,28 @@ import {
 import Link from "next/link";
 import { FaUser } from "react-icons/fa";
 import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
-import { useEffect, useState } from "react";
-import Cookie from 'js-cookie';
+
 
 export function NavUser() {
   const { isMobile } = useSidebar()
-    const [username, setUsername] = useState<string >();
-    const [profile, setProfile] = useState<string >();
+  const username = "ken";
+  const profile = "";
 
 
   // const username = session?.user?.name || "Utilisateur";
   // const profile = session?.user?.image || "";
-useEffect(()=>{
-  const storedUsername = Cookie.get('username');
-  const storedProfile = Cookie.get('profile');
-  
-  if (username) {
-    setUsername(storedUsername);
-  }
+  // useEffect(()=>{
+  //   const storedUsername = Cookie.get('username');
+  //   const storedProfile = Cookie.get('profile');
 
-  if(profile){
-    setProfile(storedProfile)
-  }
-},[])
+  //   if (username) {
+  //     setUsername(storedUsername);
+  //   }
+
+  //   if(profile){
+  //     setProfile(storedProfile)
+  //   }
+  // },[])
   return (
     <SidebarMenu>
       <SidebarMenuItem>
