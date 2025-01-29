@@ -75,7 +75,7 @@ const Postes = () => {
     setLoading(true);
     try {
       const accessToken = session?.accessToken;
-      const response = await axios.get(`${process.env.NEXT_PUBLIC_API_BASE_URL}/posts`, {
+      const response = await axios.get(`${process.env.NEXT_PUBLIC_API_BASE_URL}/posts/`, {
         headers: {
           Authorization: `Bearer ${accessToken}`,  // Utiliser le token d'accès
         },

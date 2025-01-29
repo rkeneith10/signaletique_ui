@@ -55,7 +55,7 @@ const AddFileEmploye = () => {
 
   const fetchFile = async () => {
     try {
-      const response = await axios.get(`${process.env.NEXT_PUBLIC_API_BASE_URL}/files/by-employee/${id}`, {
+      const response = await axios.get(`${process.env.NEXT_PUBLIC_API_BASE_URL}/files/by-employee/${id}/`, {
         headers: {
           Authorization: `Bearer ${accessToken}`
         }
@@ -68,7 +68,7 @@ const AddFileEmploye = () => {
 
   const fetchEmploye = async () => {
     try {
-      const response = await axios.get(`${process.env.NEXT_PUBLIC_API_BASE_URL}/employees/${id}`, {
+      const response = await axios.get(`${process.env.NEXT_PUBLIC_API_BASE_URL}/employees/${id}/`, {
         headers: {
           Authorization: `Bearer ${accessToken}`
         }

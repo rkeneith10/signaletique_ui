@@ -137,7 +137,7 @@ const Employes = () => {
     setLoading(true);
     try {
       const accessToken = session?.accessToken;
-      const response = await axios.get(`${process.env.NEXT_PUBLIC_API_BASE_URL}/employees`,{
+      const response = await axios.get(`${process.env.NEXT_PUBLIC_API_BASE_URL}/employees/`,{
         headers: {
           Authorization: `Bearer ${accessToken}`,  
         },

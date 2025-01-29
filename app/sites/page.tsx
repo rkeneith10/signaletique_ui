@@ -83,7 +83,7 @@ const Sites = () => {
 
     try {
       const accessToken = session?.accessToken as string;
-      const response = await axios.get(`${process.env.NEXT_PUBLIC_API_BASE_URL}/sites`, {
+      const response = await axios.get(`${process.env.NEXT_PUBLIC_API_BASE_URL}/sites/`, {
         headers: {
           Authorization: `Bearer ${accessToken}`,  // Utiliser le token d'accès
         },
