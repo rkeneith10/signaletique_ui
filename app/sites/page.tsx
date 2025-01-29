@@ -20,11 +20,11 @@ import {
 import { Pagination, PaginationContent, PaginationEllipsis, PaginationItem, PaginationLink, PaginationNext, PaginationPrevious } from "@/components/ui/pagination";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import axios from "axios";
+import { useSession } from 'next-auth/react';
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
 import { FaEdit, FaTrash } from 'react-icons/fa';
 import { toast } from 'sonner';
-import { useSession } from 'next-auth/react';
 
 interface Site {
   id: number;
@@ -68,19 +68,19 @@ const Sites = () => {
   };
   const handleFailed = () => {
     toast.error("Une erreur est survenue lors de l'ajout");
-  
+
   };
   useEffect(() => {
     document.title = "Sites"
     fetchPost();
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
-  const { data: session } = useSession(); 
+  const { data: session } = useSession();
   const fetchPost = async () => {
-    
+
     setLoading(true);
-    
+
     try {
       const accessToken = session?.accessToken as string;
       const response = await axios.get(`${process.env.NEXT_PUBLIC_API_BASE_URL}/sites`, {
@@ -95,7 +95,7 @@ const Sites = () => {
       setLoading(false);
     }
   };
-  
+
 
   const handleDelete = async () => {
     try {
@@ -104,10 +104,10 @@ const Sites = () => {
 
         const idToDelete = checkedItem[0];
         await axios.delete(`${process.env.NEXT_PUBLIC_API_BASE_URL}/sites/${idToDelete}/`, {
-        headers: {
-          Authorization: `Bearer ${accessToken}`,  
-        },
-      });
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+          },
+        });
         setSiteData(siteData.filter((item) => item.id !== idToDelete));
       } else {
 
@@ -115,12 +115,12 @@ const Sites = () => {
 
         await axios.post(`${process.env.NEXT_PUBLIC_API_BASE_URL}/sites/delete-multiple/`, {
           site_ids
-        },{
+        }, {
           headers: {
-            Authorization: `Bearer ${accessToken}`,  
+            Authorization: `Bearer ${accessToken}`,
           },
         }
-      );
+        );
         setSiteData(siteData.filter((item) => !checkedItem.includes(item.id)));
       }
       setCheckedItem([]);
@@ -129,6 +129,7 @@ const Sites = () => {
       console.error("Erreur lors de la suppression :", error);
     }
   };
+  console.log(process.env.NEXT_PUBLIC_API_BASE_URL)
   return (
     <Layout isAuthenticated>
       <div className='mt-2 mr-4 ml-4'>
@@ -276,19 +277,19 @@ const Sites = () => {
                 </AlertDialogDescription>
               </AlertDialogHeader>
               <AlertDialogFooter>
-                <AlertDialogCancel onClick={() =>  setShowModalDelete(false) }>Annuler</AlertDialogCancel>
-        
-              <AlertDialogAction
-                onClick={handleDelete}
-              >
-                Supprimer
-              </AlertDialogAction>
-            </AlertDialogFooter>
-          </AlertDialogContent>
+                <AlertDialogCancel onClick={() => setShowModalDelete(false)}>Annuler</AlertDialogCancel>
+
+                <AlertDialogAction
+                  onClick={handleDelete}
+                >
+                  Supprimer
+                </AlertDialogAction>
+              </AlertDialogFooter>
+            </AlertDialogContent>
           </AlertDialog>
         )}
 
-    </div>
+      </div>
     </Layout >
   )
 }

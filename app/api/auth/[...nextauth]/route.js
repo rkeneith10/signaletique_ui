@@ -10,6 +10,7 @@ const authOptions = {
         password: { label: 'Mot de passe', type: 'password' },
       },
       async authorize(credentials) {
+        console.log(process.env.NEXT_PUBLIC_API_BASE_URL)
         const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/login/`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -76,7 +77,7 @@ const authOptions = {
     strategy: "jwt",
     maxAge: 900,
   },
-  secret: "Signaletique",  
+  secret: `${process.env.NEXTAUTH_SECRET}`,  
 };
 
 const handler = NextAuth(authOptions);
